@@ -1,4 +1,19 @@
 
+import ps from "perfect-scrollbar";
+import tempSource from "core/source";
+import navigator from "core/navigator";
+import latextComands from "core/latex";
+
+// Style.
+import mainStyles from "styles/main.css";
+import cnxmlStyles from "styles/cnxml.css";
+import eqStyles from "styles/equations.css";
+import workspaceStyles from "styles/workspace.css";
+
+
+
+
+/*
 const Comet = (function(cnxml, Navigator, Ps, latextComands, {
   createElement, loopstack, pause, debounce, wrapElement, wrapMath, fuzzysearch
 }) {
@@ -182,3 +197,4 @@ const Comet = (function(cnxml, Navigator, Ps, latextComands, {
   document.addEventListener('keydown', interceptKeys);
 
 }(cnxml, Navigator, Ps, latextComands, utils));
+*/

@@ -1,0 +1,20 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: sans-serif;
+}
+
+div[data-type] {
+  margin: 3px 0;
+  padding-left: 5px;
+  position: relative;
+  border-left: 2px solid #705c8a;
+}
+
+section {
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  background: #21252b;
+}

@@ -4,6 +4,7 @@
   "description": "Tool for editing MML equations in XML documents.",
   "main": "index.html",
   "scripts": {
+    "start": "webpack-dev-server",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
@@ -17,7 +18,15 @@
   "author": "Wojciech Ludwin, ludekarts@gmail.com",
   "license": "MIT",
   "devDependencies": {
+    "css-loader": "^0.28.4",
+    "extract-text-webpack-plugin": "^3.0.0",
+    "file-loader": "^0.11.2",
+    "html-webpack-plugin": "^2.29.0",
+    "style-loader": "^0.18.2",
     "webpack": "^3.3.0",
     "webpack-dev-server": "^2.6.1"
+  },
+  "dependencies": {
+    "perfect-scrollbar": "^0.7.1"
   }
 }

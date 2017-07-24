@@ -1,0 +1,9 @@
+emphasis[effect=italics] {
+  font-style: italic;
+  color: #d3d8e0;
+}
+
+emphasis[effect=bold] {
+  font-weight: bold;
+  color: #d3d8e0;
+}
