@@ -1,0 +1,23 @@
+{
+  "name": "comet",
+  "version": "0.0.1",
+  "description": "Tool for editing MML equations in XML documents.",
+  "main": "index.html",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "Math",
+    "MathML",
+    "LaTeX",
+    "Editing",
+    "XML",
+    "CNXML"
+  ],
+  "author": "Wojciech Ludwin, ludekarts@gmail.com",
+  "license": "MIT",
+  "devDependencies": {
+    "webpack": "^3.3.0",
+    "webpack-dev-server": "^2.6.1"
+  }
+}
