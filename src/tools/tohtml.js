@@ -1,9 +1,15 @@
-const toHtml = function(uid, copyAttrs, createElement) {
+import {copyAttrs} from "tools/utils";
+import {createElement} from "tools/travrs";
+
+export default function toHtml(cnxml) {
 
   // Instantiate XML parser.
   const parser = new DOMParser();
   const xml = parser.parseFromString(cnxml, "application/xml");
   const content = xml.querySelector('content') || xml;
+
+  // Do not pars those elements.
+  const excluded = ['math', 'term', 'emphasis'];
 
   // Create new 'x-tag' element from the Editable element.
   const cloneElement = (clone, node) => {

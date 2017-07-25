@@ -16,10 +16,7 @@
 // e.g:
 // const refs = { referenceName: createElement('div', 'hello') }
 
-
-const travrs = (function() {
-  
- const createElement = (phrase, content) => {
+ export const createElement = (phrase, content) => {
   // Filter attributes.
   let attrs = phrase.match(/[\w-]+=".+?"/g);
   if (attrs) attrs = attrs.map(match => match.replace(/"/g,'').split('='));
@@ -114,12 +111,9 @@ const travrs = (array, refs) => {
   return wrapper.firstChild;
 };
 
-const template = (refs, templateStr) => {
-  // Male 'refs' optional.
+export const template = (refs, templateStr) => {
+  // Make 'refs' optional.
   if (typeof refs === 'string') templateStr = refs;
   const array = templateStr.trim().split('\n');
   return travrs(array, refs);
 };
-
-  return {template, createElement};
-}());

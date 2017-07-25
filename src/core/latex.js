@@ -1,4 +1,4 @@
-const latextComands = [
+export const commands = [
   'mu',
   'pi',
   'int',

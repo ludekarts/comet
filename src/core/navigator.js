@@ -1,4 +1,4 @@
-const Navigator = function (selector) {
+export default function Navigator (selector) {
   let end, current, equations = [];
   let pointer = -1;
 
