@@ -1,4 +1,4 @@
-import {tempSource} from "core/source";
+import {tempSource} from "temps/source";
 
 // Style.
 import mainStyles from "styles/main.css";
@@ -8,7 +8,8 @@ import workspaceStyles from "styles/workspace.css";
 
 // Components.
 import ps from "perfect-scrollbar";
-import {commands} from "core/latex";
+import {commands} from "temps/latex";
+import attrsEditor from "core/attrs";
 import Navigator from "core/navigator";
 
 // Tools.
@@ -19,6 +20,7 @@ import {addComand, wrapCommand, switchCommands} from "tools/cmds";
 import {loopstack, wrapMath, pause, fuzzysearch, debouncePromise} from "tools/utils";
 
 // UI references.
+const workspace = document.getElementById('workspace');
 const preview = document.getElementById('preview');
 const editor = document.getElementById('editor');
 const input = document.getElementById('input');
@@ -60,6 +62,8 @@ const saveXmlHistory = pause(recordXmlState, 1000);
 const saveLatexHistory = pause(recordLatexState, 1500);
 const checkBuffer = debouncePromise(filterCmds(commands), 500);
 
+// Append editor.
+workspace.appendChild(attrsEditor.element);
 
 // Setup math renndering.
 MathJax.Hub.queue.Push(() => state.equation = MathJax.Hub.getAllJax("preview")[0]);
@@ -109,11 +113,13 @@ function filterCmds (commands) {
   };
 };
 
+// Change current selected equation according to latex input.
 const updateLatex = () => {
   navigator.update(input.textContent);
   recordXmlState();
 }
 
+// Undo handler.
 const restoreHistory = (target) => {
   if (target.matches('#input')) {
     restoreLatexState();
@@ -128,6 +134,7 @@ const restoreHistory = (target) => {
 keytracker
   .onkey(9, tabThrough)
   .onkey('F2', updateLatex)
+  .onkey(27, attrsEditor.hide)
   .onkey('z', 'ctrl', restoreHistory)
   .onkey('Enter', 'ctrl', renderMath)
   .onkey('[', wrapSelection('[*]'))
@@ -164,6 +171,13 @@ const keypressHandler = ({key, keyCode}) => {
       });
 };
 
+// Detect element clicked with Alt key.
+const detectElement = ({target, altKey}) => {
+  if (!altKey) return;
+  if (target.matches('span.flux-math')) navigator.set(target);
+  else attrsEditor.select(target);
+};
+
 
 // ---- Initialization ----------------
 
@@ -171,5 +185,6 @@ editor.appendChild(toHTML(tempSource));
 ps.initialize(editor);
 
 // Set event handlers.
+editor.addEventListener('click', detectElement);
 input.addEventListener('keyup', keypressHandler);
 document.addEventListener('keydown', interceptKeys);

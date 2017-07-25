@@ -5,6 +5,8 @@ export const arrayToObject = (array, key) =>
     return result;
   }, {});
 
+// Split string at index. -> splitAt(5)('HelloWord')
+export const splitAt = index => str => [str.slice(0, index), str.slice(index)];
 
 // Fortam XML input.
 export const formatXml = (xml) => {

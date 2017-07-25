@@ -4,7 +4,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 // Globals.
-const isProduction = false;
+const isProduction = process.env.NODE_ENV === 'production';
 const version = JSON.stringify(require("./package.json").version).replace(/"/g, '');
 
 
@@ -20,8 +20,18 @@ module.exports = {
 
   module: {
     loaders: [
+      // {
+      //   test: /\.js$/,
+      //   exclude: /(node_modules|bower_components)/,
+      //   use: {
+      //     loader: 'babel-loader',
+      //     options: {
+      //       presets: ['env', 'es2015']
+      //     }
+      //   }
+      // },
       {
-        test: /\.(css|scss|sass)$/,
+        test: /\.css$/,
         loader: ExtractTextPlugin.extract({
           fallback: 'style-loader',
           use: ['css-loader']
@@ -50,6 +60,7 @@ module.exports = {
 
   resolve: {
     alias: {
+      'temps': path.resolve(__dirname, 'src/templates'),
       'styles': path.resolve(__dirname, 'src/styles'),
       'tools': path.resolve(__dirname, 'src/tools'),
       'core': path.resolve(__dirname, 'src/core')

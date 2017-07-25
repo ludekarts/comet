@@ -12,4 +12,10 @@ div[data-type] {
   padding-left: 5px;
   position: relative;
   border-left: 2px solid #705c8a;
+  transition: background .3s ease;
+}
+
+div[data-type].active {
+  border-color: #edd606;
+  background: rgba(237, 214, 6, 0.1);
 }
