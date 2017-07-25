@@ -163,7 +163,7 @@ export const updateMath = (id, latex) => {
 
 // Copy arributes 'from' one element 'to' another.
 export const copyAttrs = (from, to, excluded = []) =>
-  Array.from(from.attributes || []).forEach(attr => !~excluded.indexOf(attr) && to.setAttribute(attr.name, attr.value));
+  Array.from(from.attributes || []).forEach(attr => !~excluded.indexOf(attr.name) && to.setAttribute(attr.name, attr.value));
 
 // Encode Base 64
 export const base64 = (str) =>

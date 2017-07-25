@@ -2,6 +2,11 @@ export default function Navigator (selector) {
   let end, current, equations = [];
   let pointer = -1;
 
+  const clear = () => {
+    equations.forEach(eq => eq = null);
+    equations = [];
+  };
+
   return {
     next () {
       if (current) current.classList.remove('active');
@@ -31,6 +36,7 @@ export default function Navigator (selector) {
       console.log('add', latex);
     },
     select (selector) {
+      clear();
       equations = Array.from(document.querySelectorAll(selector));
       end = equations.length - 1;
     }
