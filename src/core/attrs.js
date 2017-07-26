@@ -28,7 +28,7 @@ export default (function AttrsEditor () {
 
   const refs = {
     entries: createElement('form'),
-    input: createElement('input[type="text"]'),
+    input: createElement('input.input[type="text"]'),
     addAttrs: createElement('button.addAttrs', '+'),
     saveAttrs: createElement('button.saveAttrs', '✔')
   };
@@ -40,8 +40,10 @@ export default (function AttrsEditor () {
     state.currentElement = target;
     refs.entries.innerHTML = '';
     Array.from(target.attributes).forEach(attr => {
-      refs.entries.appendChild(entry(attr.name, attr.value));
+      if (attr.name !== 'class' || attr.value)
+        refs.entries.appendChild(entry(attr.name, attr.value));
     });
+    refs.input.focus();
     element.classList.add('show');
     state.currentElement.classList.add('active');
   };
@@ -57,7 +59,7 @@ export default (function AttrsEditor () {
     const touple = splitAt(string.indexOf('='))(string);
     touple[1] = touple[1].slice(1, touple[1].length);
     return touple;
-  }
+  };
 
   const addAttribute = () => {
     const input = refs.input.value;
@@ -73,7 +75,7 @@ export default (function AttrsEditor () {
       refs.entries.appendChild(entry(...attrFromString(input)));
   };
 
-  const saveAttribute = () => {
+  const saveAttributes = () => {
     const form = new FormData(refs.entries);
     if (state.currentElement) {
       Array.from(state.currentElement.attributes).forEach(attr => state.currentElement.removeAttribute(attr.name));
@@ -84,10 +86,17 @@ export default (function AttrsEditor () {
     }
   };
 
-  // Remove attribute entry. Alt + Delete.
-  const deleteEntries = ({target, keyCode, shiftKey}) => {
+  const keyboardHandler = ({target, keyCode, shiftKey}) => {
+    // Remove attribute entry. Shift + Delete.
     if (shiftKey && keyCode === 46 && target.matches('input.entry')) {
       refs.entries.removeChild(target.parentNode);
+    }
+    // Save attributes. Shift + Enter.
+    if (shiftKey && keyCode === 13 && target.matches('input.entry')) {
+      saveAttributes();
+    }
+    else if (keyCode === 13 && target.matches('input.input')) {
+      addAttribute();
     }
   };
 
@@ -96,9 +105,9 @@ export default (function AttrsEditor () {
     state.currentElement.classList.remove('active');
   };
 
-  element.addEventListener('keydown', deleteEntries);
+  element.addEventListener('keydown', keyboardHandler);
   refs.addAttrs.addEventListener('click', addAttribute);
-  refs.saveAttrs.addEventListener('click', saveAttribute);
+  refs.saveAttrs.addEventListener('click', saveAttributes);
 
   ps.initialize(element);
   return { element, select, hide };

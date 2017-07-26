@@ -17,7 +17,7 @@ import toHTML from "tools/tohtml";
 import Keytracker from "tools/keytracker";
 import {toXML, cleanMath} from "tools/toxml";
 import {addComand, wrapCommand, switchCommands} from "tools/cmds";
-import {loopstack, wrapMath, pause, debouncePromise, endCaret} from "tools/utils";
+import {loopstack, wrapMath, pause, debouncePromise, endCaret, clipboard} from "tools/utils";
 
 // UI references.
 const workspace = document.getElementById('workspace');
@@ -58,6 +58,7 @@ const state = {
 // Global methods.
 const navigator = Navigator();
 const keytracker =  Keytracker();
+const clip = clipboard(workspace);
 const renderXMLMath = wrapMath(editor);
 const saveXmlHistory = pause(recordXmlState, 1000);
 const saveLatexHistory = pause(recordLatexState, 1500);
@@ -90,14 +91,16 @@ const wrapSelectedText = (template) => () => {
 };
 
 // Tab key handler.
-const tabThrough = ({target}) => {
+const tabThrough = (event) => {
   // Tab commands in input.
-  if (state.cmdReference && target.matches('#input')) {
+  if (state.cmdReference && event.target.matches('#input')) {
+    event.preventDefault();
     state.cmdReference.textContent = state.getCommand();
     recordLatexState();
   }
   // Tab through equations in XML.
-  else {
+  else if (event.target.matches('#editor')) {
+    event.preventDefault();
     navigator.next().scrollIntoView();
     editor.scrollTop = editor.scrollTop - 60;
   }
@@ -136,15 +139,15 @@ const restoreHistory = ({target}) => {
 };
 
 const exportToXML = () => {
-  console.log(toXML(editor.firstElementChild.cloneNode(true)));
+  console.log(toXML(cleanMath(editor.firstElementChild.cloneNode(true))));
 }
 
 // Setup keyboard events.
 keytracker
-  .onkey(9, tabThrough)
   .onkey('F2', updateLatex)
   .onkey(27, attrsEditor.hide)
   .onkey('x', 'alt', exportToXML)
+  .onkey(9, '!prevent', tabThrough)
   .onkey('z', 'ctrl', restoreHistory)
   .onkey('Enter', 'ctrl', renderMath)
   .onkey('[', wrapSelectedText('[*]'))
@@ -175,18 +178,19 @@ const keypressHandler = ({key, keyCode}) => {
         if (cmds.length > 0) {
           // Set global references.
           state.getCommand = switchCommands(cmds);
-          console.log(cmds);
-          state.cmdReference = addComand(cmds.length === 1 ? cmds[0] : state.buffer, state.buffer);
+          state.cmdReference = addComand(state.buffer, state.buffer);
         }
         state.buffer = '';
       });
 };
 
 // Detect element clicked with Alt key.
-const detectElement = ({target, altKey}) => {
-  if (!altKey) return;
-  if (target.matches('span.flux-math')) navigator.set(target);
-  else attrsEditor.select(target);
+const detectElement = ({target, altKey, ctrlKey}) => {
+  const isMath = target.matches('span.flux-math');
+  if (altKey && isMath) navigator.set(target)
+  if (altKey && !isMath) attrsEditor.select(target);
+  if (ctrlKey && isMath) clip(target.querySelector('script').innerHTML);
+  if (ctrlKey && !isMath && target.id) clip(target.id);
 };
 
 

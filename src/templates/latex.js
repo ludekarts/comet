@@ -23,6 +23,8 @@ export const commands = [
   '\\widehat',
   '\\overline',
   '\\textstyle',
+  '\\varepsilon',
+  '\\boldsymbol',
   '\\operatorname',
   '\\overrightarrow',
 ];

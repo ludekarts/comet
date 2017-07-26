@@ -57,13 +57,13 @@ const transformMath = (node) =>
 // Do not allow for line breake.
 const removeNewLines = (node) => node.parentNode.removeChild(node);
 
-  // Transform <i> & <b> tags from Chrome.
-  const transformEmphasis = (node) => {
-    if (node.matches('i'))
-      node.outerHTML = `<emphasis effect="italics">${node.innerHTML}</emphasis>`;
-    else if (node.matches('b'))
-      node.outerHTML = `<emphasis effect="bold">${node.innerHTML}</emphasis>`;
-  };
+// Transform <i> & <b> tags from Chrome.
+const transformEmphasis = (node) => {
+  if (node.matches('i'))
+    node.outerHTML = `<emphasis effect="italics">${node.innerHTML}</emphasis>`;
+  else if (node.matches('b'))
+    node.outerHTML = `<emphasis effect="bold">${node.innerHTML}</emphasis>`;
+};
 
 // Ensuea all ids are unique
 const transformUniqueIds = (collection = []) => (node) => {
@@ -75,35 +75,14 @@ const transformUniqueIds = (collection = []) => (node) => {
   }
 };
 
-// Trabsform HTML table into CNXML table.
-const transformTables = (table) => {
-
-  const cols = table.getAttribute('cols');
-  const title = table.getAttribute('title');
-
-  table.appendChild(moveNodes(table, createElement(`tgroup[cols="${cols}"]`)));
-  table.removeAttribute('cols');
-
-  if (title) {
-    table.insertBefore(createElement('title', title), table.firstChild);
-    table.removeAttribute('title');
-  }
-
-  table.outerHTML = table.outerHTML
-    .replace(/tr>/g, 'row>')
-    .replace(/td>/g, 'entry>')
-    .replace(/<td\/>/g, '<entry/>')
-};
 
 // Convert 'source' HTML tree into XML string.
 export const toXML = (htmlNode) => {
 
   // Check for duplicate IDs.
   Array.from(htmlNode.querySelectorAll('*[id]')).forEach(transformUniqueIds([]));
-
   // Clone source HTML node.
   const sourceClone = cleanMath(htmlNode.cloneNode(true));
-
   // Transform new line.
   Array.from(sourceClone.querySelectorAll('br')).forEach(removeNewLines);
 
@@ -128,10 +107,7 @@ export const toXML = (htmlNode) => {
 
   // Transform back some of the xml tags to be compatible with CNXML standard.
   Array.from(cnxml.querySelectorAll('reference')).forEach(transformRefs);
-  Array.from(cnxml.querySelectorAll('b, i')).forEach(transformEmphasis);
-  Array.from(cnxml.querySelectorAll('table')).forEach(transformTables);
   Array.from(cnxml.querySelectorAll('math')).forEach(transformMath);
-
 
   // Return final CNXML.
   return serializer.serializeToString(cnxml)

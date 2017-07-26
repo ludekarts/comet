@@ -1,7 +1,7 @@
 {
   "name": "comet",
   "version": "0.0.1",
-  "description": "Tool for editing MML equations in XML documents.",
+  "description": "Tool for editing MML equations in CNXML documents.",
   "main": "index.html",
   "scripts": {
     "start": "webpack-dev-server",

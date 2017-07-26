@@ -17,3 +17,30 @@ term {
   font-weight: bold;
   color: #d613d8;
 }
+
+div[data-type=table] {
+  width: 100%;
+  display: table;
+  margin: 0 auto;
+  border-color: #00bab5;
+}
+
+div[data-type=thead] {
+  width: 100%;
+  display: table;
+  font-weight: bold;
+}
+
+div[data-type=tbody] {
+  display: table;
+  width: 100%;
+  margin: 0px;
+}
+
+div[data-type=row] {
+  display: table-row;
+}
+
+div[data-type=entry] {
+  display: table-cell;
+}

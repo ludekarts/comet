@@ -1,3 +1,129 @@
+export const tempSourceB = `
+  <table
+  id="fs-id1167134435354"
+  summary="A two column, four row table is shown. The first column contains “Angular displacement from average angular velocity,” “Angular velocity from angular acceleration,” Angular displacement from angular velocity and angular acceleration,” and “Angular velocity from angular displacement and angular acceleration.” The second column contains “theta subscript f equals theta subscript zero plus omega with a line over it times t,” “omega subscript f equals omega subscript zero plus alpha times t,” “theta subscript f equals theta subscript 0 plus omega subscript 0 times t plus one half alpha times t squared,” and “omega subscript f superscript 2 equals omega subscript zero superscript 2 plus 2 alpha times delta theta.”">
+  <tgroup cols="2">
+    <colspec colnum="1" colname="col1"/>
+    <colspec colnum="2" colname="col2"/>
+    <tbody>
+      <row valign="top">
+        <entry valign="top" align="left">Zależność drogi kątowej (położenia kątowego) od średniej prędkości kątowej</entry>
+        <entry valign="top" align="left">
+          <m:math>
+            <m:mrow>
+              <m:msub>
+                <m:mi>θ</m:mi>
+                <m:mtext>k</m:mtext>
+              </m:msub>
+              <m:mo>=</m:mo>
+              <m:msub>
+                <m:mi>θ</m:mi>
+                <m:mn>0</m:mn>
+              </m:msub>
+              <m:mo>+</m:mo>
+              <m:mover accent="true">
+                <m:mi>ω</m:mi>
+                <m:mo>–</m:mo>
+              </m:mover>
+              <m:mi>t</m:mi>
+            </m:mrow>
+          </m:math>
+        </entry>
+      </row>
+      <row valign="top">
+        <entry valign="top" align="left">Zależność prędkości kątowej od stałego przyspieszenia kątowego</entry>
+        <entry valign="top" align="left">
+          <m:math>
+            <m:mrow>
+              <m:msub>
+                <m:mi>ω</m:mi>
+                <m:mtext>k</m:mtext>
+              </m:msub>
+              <m:mo>=</m:mo>
+              <m:msub>
+                <m:mi>ω</m:mi>
+                <m:mn>0</m:mn>
+              </m:msub>
+              <m:mo>+</m:mo>
+              <m:mi>ε</m:mi>
+              <m:mi>t</m:mi>
+            </m:mrow>
+          </m:math>
+        </entry>
+      </row>
+      <row valign="top">
+        <entry valign="top" align="left">Zależność drogi kątowej (położenia kątowego) od początkowej prędkości kątowej i przyspieszenia kątowego</entry>
+        <entry valign="top" align="left">
+          <m:math>
+            <m:mrow>
+              <m:msub>
+                <m:mi>θ</m:mi>
+                <m:mtext>k</m:mtext>
+              </m:msub>
+              <m:mo>=</m:mo>
+              <m:msub>
+                <m:mi>θ</m:mi>
+                <m:mn>0</m:mn>
+              </m:msub>
+              <m:mo>+</m:mo>
+              <m:msub>
+                <m:mi>ω</m:mi>
+                <m:mn>0</m:mn>
+              </m:msub>
+              <m:mi>t</m:mi>
+              <m:mo>+</m:mo>
+              <m:mfrac>
+                <m:mn>1</m:mn>
+                <m:mn>2</m:mn>
+              </m:mfrac>
+              <m:mi>ε</m:mi>
+              <m:msup>
+                <m:mi>t</m:mi>
+                <m:mn>2</m:mn>
+              </m:msup>
+            </m:mrow>
+          </m:math>
+        </entry>
+      </row>
+      <row valign="top">
+        <entry valign="top" align="left">Związek prędkości kątowej z drogą kątową i przyspieszeniem kątowym</entry>
+        <entry valign="top" align="left">
+          <m:math>
+            <m:mrow>
+              <m:msubsup>
+                <m:mi>ω</m:mi>
+                <m:mtext>k</m:mtext>
+                <m:mn>2</m:mn>
+              </m:msubsup>
+              <m:mo>=</m:mo>
+              <m:msub>
+                <m:mi>ω</m:mi>
+                <m:mn>0</m:mn>
+              </m:msub>
+              <m:msup><m:mrow/>
+                <m:mn>2</m:mn>
+              </m:msup>
+              <m:mo>+</m:mo>
+              <m:mn>2</m:mn>
+              <m:mi>ε</m:mi>
+              <m:mo stretchy="false">(</m:mo>
+              <m:mtext>Δ</m:mtext>
+              <m:mi>θ</m:mi>
+              <m:mo stretchy="false">)</m:mo>
+            </m:mrow>
+          </m:math>
+        </entry>
+      </row>
+    </tbody>
+  </tgroup>
+</table>`;
+
+export const tempSourceA = `
+  <content>
+    <para> <link target-id="dupa123"/> </para>
+  </content>
+`;
+
 export const tempSource = `
 <document xmlns="http://cnx.rice.edu/cnxml" xmlns:md="http://cnx.rice.edu/mdml" xmlns:bib="http://bibtexml.sf.net/" xmlns:m="http://www.w3.org/1998/Math/MathML" xmlns:q="http://cnx.rice.edu/qml/1.0" id="new" cnxml-version="0.7" module-id="new">
 
