@@ -12,8 +12,10 @@ export default function Keytracker() {
         if (mod === 'alt') result.alt = 'alt';
         if (mod === 'ctrl') result.ctrl = 'ctrl';
         if (mod === 'shift') result.shift = 'shift';
+        // This modifier will not block event default.
+        if (mod === '!prevent') result.def = true;
         return result;
-      } , {alt: '', ctrl: '', shift: ''});
+      } , {alt: '', ctrl: '', shift: '', def: false});
 
       let modifiers = modDetect.alt + modDetect.ctrl + modDetect.shift;
       if (modifiers.length === 0) modifiers = '*';
@@ -28,6 +30,9 @@ export default function Keytracker() {
         callbacks[key][modifiers] = [callback];
       }
 
+      // Do not prevent default for this key.
+      if (modDetect.def) callbacks[key].passEvent = true;
+
       return api;
     },
 
@@ -36,6 +41,7 @@ export default function Keytracker() {
       const keyHandel = callbacks[key] || callbacks[keyCode];
 
       if (keyHandel) {
+        const passEvent = keyHandel.passEvent || false;
         const modifiers =
           (altKey ? 'alt' : '')
           + (ctrlKey ? 'ctrl' : '')
@@ -47,8 +53,8 @@ export default function Keytracker() {
             : keyHandel[modifiers];
 
         if (callback) {
-          event.preventDefault();
-          callback.forEach(call => call(target))
+          !passEvent && event.preventDefault();
+          callback.forEach(call => call(event))
         }
       }
     }

@@ -17,7 +17,7 @@ import toHTML from "tools/tohtml";
 import Keytracker from "tools/keytracker";
 import {toXML, cleanMath} from "tools/toxml";
 import {addComand, wrapCommand, switchCommands} from "tools/cmds";
-import {loopstack, wrapMath, pause, fuzzysearch, debouncePromise} from "tools/utils";
+import {loopstack, wrapMath, pause, debouncePromise, endCaret} from "tools/utils";
 
 // UI references.
 const workspace = document.getElementById('workspace');
@@ -32,6 +32,7 @@ const recordLatexState = () => {
 
 const restoreLatexState = () => {
   input.textContent = state.latexHistory.pull();
+  endCaret(input);
 };
 
 const recordXmlState = () => {
@@ -78,7 +79,7 @@ const reRenderMath = (callback) =>
   MathJax.Hub.Queue(["Typeset", MathJax.Hub, renderXMLMath, callback]);
 
 // Wrap selection with wrappers.
-const wrapSelection = (template) => () => {
+const wrapSelectedText = (template) => () => {
   const wraps = template.split('*');
   const selection = window.getSelection();
   const range = selection.getRangeAt(0);
@@ -89,27 +90,31 @@ const wrapSelection = (template) => () => {
 };
 
 // Tab key handler.
-const tabThrough = (target) => {
-  state.cmdReference && target.matches('#input')
-    // Tab commands in input.
-    ? (state.cmdReference.textContent = `\\${state.getCommand()}` , recordLatexState())
-    // Tab through equations in XML.
-    : navigator.next().scrollIntoView();
+const tabThrough = ({target}) => {
+  // Tab commands in input.
+  if (state.cmdReference && target.matches('#input')) {
+    state.cmdReference.textContent = state.getCommand();
+    recordLatexState();
+  }
+  // Tab through equations in XML.
+  else {
+    navigator.next().scrollIntoView();
+    editor.scrollTop = editor.scrollTop - 60;
+  }
 };
 
-const wrapWithCommand = (buffer) => () =>
-  wrapCommand('mathrm', buffer).then(recordLatexState);
+const wrapWithCommand = (buffer) => (event) => {
+  if (event.target.matches('#input')) {
+    event.preventDefault();
+    wrapCommand('mathrm', buffer).then(recordLatexState);
+  }
+};
 
 // Filter commands base on buffer string.
 function filterCmds (commands) {
   return (buffer) => {
     buffer = buffer.trim();
-    if (buffer.length <= 1) return [];
-    const index = commands.indexOf(buffer);
-    const filteredCmds = ~index
-      ? [commands[index]]
-      : commands.filter(cmd => fuzzysearch(buffer, cmd));
-    return filteredCmds;
+    return (buffer.length > 1) ? commands.filter(cmd => ~cmd.indexOf(buffer)) : []
   };
 };
 
@@ -117,10 +122,10 @@ function filterCmds (commands) {
 const updateLatex = () => {
   navigator.update(input.textContent);
   recordXmlState();
-}
+};
 
 // Undo handler.
-const restoreHistory = (target) => {
+const restoreHistory = ({target}) => {
   if (target.matches('#input')) {
     restoreLatexState();
   }
@@ -130,19 +135,24 @@ const restoreHistory = (target) => {
   }
 };
 
+const exportToXML = () => {
+  console.log(toXML(editor.firstElementChild.cloneNode(true)));
+}
+
 // Setup keyboard events.
 keytracker
   .onkey(9, tabThrough)
   .onkey('F2', updateLatex)
   .onkey(27, attrsEditor.hide)
+  .onkey('x', 'alt', exportToXML)
   .onkey('z', 'ctrl', restoreHistory)
   .onkey('Enter', 'ctrl', renderMath)
-  .onkey('[', wrapSelection('[*]'))
-  .onkey('|', 'shift', wrapSelection('|*|'))
-  .onkey('{', 'shift', wrapSelection('{*}'))
-  .onkey('(', 'shift', wrapSelection('(*)'))
-  .onkey('i', 'ctrl', wrapWithCommand(state.buffer))
-  .onkey(38, 'alt', wrapSelection('\\left*\\right'));
+  .onkey('[', wrapSelectedText('[*]'))
+  .onkey('|', 'shift', wrapSelectedText('|*|'))
+  .onkey('{', 'shift', wrapSelectedText('{*}'))
+  .onkey('(', 'shift', wrapSelectedText('(*)'))
+  .onkey(38, 'alt', wrapSelectedText('\\left*\\right'))
+  .onkey('i', 'ctrl', '!prevent', wrapWithCommand(state.buffer));
 
 
 // ---- Event handlers ----------------
@@ -165,7 +175,8 @@ const keypressHandler = ({key, keyCode}) => {
         if (cmds.length > 0) {
           // Set global references.
           state.getCommand = switchCommands(cmds);
-          state.cmdReference = addComand(cmds.slice(-1)[0], state.buffer);
+          console.log(cmds);
+          state.cmdReference = addComand(cmds.length === 1 ? cmds[0] : state.buffer, state.buffer);
         }
         state.buffer = '';
       });
@@ -188,3 +199,10 @@ ps.initialize(editor);
 editor.addEventListener('click', detectElement);
 input.addEventListener('keyup', keypressHandler);
 document.addEventListener('keydown', interceptKeys);
+
+// TODO:
+// - lista stworzonych równań
+// - zapis XML
+// - obsługa tabel
+// - obsluga linków
+// - woijanie elementów

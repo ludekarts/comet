@@ -1,7 +1,7 @@
 
 export const addComand = (commad, buffer = '', content) => {
   const selection = window.getSelection();
-  const cnode = document.createTextNode('\\' + commad + (content ? `{${content}}` : ''));
+  const cnode = document.createTextNode(commad + (content ? `{${content}}` : ''));
   const range = selection.getRangeAt(0);
   range.setStart(range.commonAncestorContainer, range.endOffset - buffer.length);
   range.setEnd(range.commonAncestorContainer, range.endOffset);

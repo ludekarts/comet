@@ -1,9 +1,19 @@
-emphasis[effect=italics] {
+emphasis[effect=italics], i {
   font-style: italic;
-  color: #d3d8e0;
+  color: #eeac00;
 }
 
-emphasis[effect=bold] {
+emphasis[effect=bold], b {
   font-weight: bold;
-  color: #d3d8e0;
+  color: #4092da;
+}
+
+reference {
+  text-decoration: underline;
+  color: #0ebfe6;
+}
+
+term {
+  font-weight: bold;
+  color: #d613d8;
 }

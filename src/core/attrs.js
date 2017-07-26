@@ -80,12 +80,13 @@ export default (function AttrsEditor () {
       for (let [key, value] of form.entries()) {
         state.currentElement.setAttribute(key, value);
       }
+      hide();
     }
   };
 
   // Remove attribute entry. Alt + Delete.
-  const deleteEntries = ({target, keyCode, altKey}) => {
-    if (altKey && keyCode === 46 && target.matches('input.entry')) {
+  const deleteEntries = ({target, keyCode, shiftKey}) => {
+    if (shiftKey && keyCode === 46 && target.matches('input.entry')) {
       refs.entries.removeChild(target.parentNode);
     }
   };
@@ -93,7 +94,7 @@ export default (function AttrsEditor () {
   const hide = () => {
     element.classList.remove('show');
     state.currentElement.classList.remove('active');
-  }
+  };
 
   element.addEventListener('keydown', deleteEntries);
   refs.addAttrs.addEventListener('click', addAttribute);

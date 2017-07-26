@@ -17,10 +17,11 @@
 }
 
 #editor {
+  color: #aaa;
   width: 100%;
   height: 100%;
   padding: 10px;
-  color: #abb2bf;
+  /*color: #abb2bf;*/
   font-size: 14px;
   line-height: 19px;
   position: absolute;

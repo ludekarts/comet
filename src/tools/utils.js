@@ -46,24 +46,6 @@ export const elFromString = (source) =>
   document.createRange().createContextualFragment(source);
 
 
-const getNodesOut = (current) => {
-  const parent = current.parentNode;
-  let next, node = current.firstChild;
-  while (node) {
-    next = node.nextSibling;
-    parent.insertBefore(node, current);
-    node = next;
-  }
-  parent.removeChild(current);
-};
-
-// Unwrap elements that have carret on it
-export const unwrapElement = (stopAt) => {
-  const selection = window.getSelection();
-  const anchor = selection.anchorNode;
-  if (anchor && !anchor.parentNode.matches(stopAt)) getNodesOut(anchor.parentNode);
-};
-
 // Insert 'node' as a sibling of 'target' node if target is an ElementChild.
 // If target is a test node add sibling to its parent.
 export const insertSiblingNode = (target, node) => {
@@ -107,7 +89,7 @@ export const moveNodes = (from, to) => {
 };
 
 // Set caret at the end og given element.
-export const setCaret = (element) => {
+export const endCaret = (element) => {
   const selection = window.getSelection();
   const range = document.createRange();
   if (!element.lastChild) return;
@@ -119,6 +101,33 @@ export const setCaret = (element) => {
   } catch (e) {
     // TODO: handle this better.
   }
+};
+
+const getNodesOut = (current) => {
+  const parent = current.parentNode;
+  let next, node = current.firstChild;
+  while (node) {
+    next = node.nextSibling;
+    parent.insertBefore(node, current);
+    node = next;
+  }
+  parent.removeChild(current);
+};
+
+// Unwrap elements that have carret on it
+export const unwrapElement = (stopAt) => {
+  const selection = window.getSelection();
+  const anchor = selection.anchorNode;
+  if (anchor && !anchor.parentNode.matches(stopAt)) getNodesOut(anchor.parentNode);
+};
+
+export const wrapSelection = (type, attrs) => {
+  const selection = window.getSelection();
+  const range = selection.getRangeAt(0);
+  const wrapper = document.createElement(type);
+  attrs && Object.keys(attrs).forEach(name => wrapper.setAttribute(name, attrs[name]));
+  range.surroundContents(wrapper);
+  return wrapper;
 };
 
 // Wrap 'elements' with HTMLElement of given 'type' with provided 'attrs'.

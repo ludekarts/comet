@@ -1,6 +1,8 @@
 /* EQUATIONS */
 
 span.flux-math {
+  color: #acf153;
+  position: relative;
   display: inline-block;
   transition: all .2s ease;
 }
@@ -9,14 +11,15 @@ span.flux-math:before {
   content: ' ';
   top: 0;
   left: 0;
+  right: 0;
+  bottom: 0;
   z-index: 10;
-  width: 100%;
-  height: 100%;
   display: block;
   position: absolute;
 }
 
 span.flux-math.active {
+  color: white;
   padding: 4px 6px;
   border-radius: 3px;
   transition: all .2s ease;

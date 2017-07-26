@@ -57,13 +57,13 @@ const transformMath = (node) =>
 // Do not allow for line breake.
 const removeNewLines = (node) => node.parentNode.removeChild(node);
 
-// Transform <i> & <b> tags from Chrome.
-const transformEmphasis = (node) => {
-  if (node.matches('i'))
-    node.outerHTML = `<emphasis effect="italics">${node.innerHTML}</emphasis>`;
-  else if (node.matches('b'))
-    node.outerHTML = `<emphasis effect="bold">${node.innerHTML}</emphasis>`;
-};
+  // Transform <i> & <b> tags from Chrome.
+  const transformEmphasis = (node) => {
+    if (node.matches('i'))
+      node.outerHTML = `<emphasis effect="italics">${node.innerHTML}</emphasis>`;
+    else if (node.matches('b'))
+      node.outerHTML = `<emphasis effect="bold">${node.innerHTML}</emphasis>`;
+  };
 
 // Ensuea all ids are unique
 const transformUniqueIds = (collection = []) => (node) => {
@@ -109,7 +109,11 @@ export const toXML = (htmlNode) => {
 
   // Create x-tag equivalents of CNXML. This will make easier
   // to translate CNXML elements that aren't compatible with HTML5
-  const xml = clone(sourceClone, createElement('x-content')).outerHTML
+  const firstElement = sourceClone.firstElementChild.cloneNode();
+  const root = createElement(firstElement.dataset.type || 'div');
+  copyAttrs(firstElement, root, ['data-type']);
+
+  const xml = clone(sourceClone.firstElementChild, root).outerHTML
     // Remove 'x-' prefix at the end.
     .replace(/<x-|<\/x-/g, (x) => ~x.indexOf('<\/') ? '</' : '<')
     // Close <img> tags.
@@ -128,12 +132,15 @@ export const toXML = (htmlNode) => {
   Array.from(cnxml.querySelectorAll('table')).forEach(transformTables);
   Array.from(cnxml.querySelectorAll('math')).forEach(transformMath);
 
+
   // Return final CNXML.
   return serializer.serializeToString(cnxml)
     // Remove unecesery xml namesapces form CNXML elements -> Leftovers from parsing & editing.
     .replace(/xmlns="http:\/\/www\.w3\.org\/1999\/xhtml"/g, '')
     // Remove MathML namespace -> from MatJax math updates.
-    .replace(/\s*xmlns="http:\/\/www.w3.org\/1998\/Math\/MathML"/g, '')
+    // .replace(/\s*xmlns="http:\/\/www.w3.org\/1998\/Math\/MathML"/g, '')
+    // Remove empty & active 'class' atributes.
+    replace(/\s+class=(""|"active")"/g, '')
     // Remove all spaces between tags.
     .replace(/>\s*?</g, '><')
     // Remove all multiple spaces.

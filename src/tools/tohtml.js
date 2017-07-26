@@ -1,11 +1,15 @@
 import {copyAttrs} from "tools/utils";
 import {createElement} from "tools/travrs";
 
-export default function toHtml(cnxml) {
+export default function toHtml(source) {
+
+  const processXml = source
+    // Remove MathML namespace.
+    .replace(/<(\/?)m:/g, (match, slash) => ~match.indexOf('<') ? ('<' + slash) : '');
 
   // Instantiate XML parser.
   const parser = new DOMParser();
-  const xml = parser.parseFromString(cnxml, "application/xml");
+  const xml = parser.parseFromString(processXml, "application/xml");
   const content = xml.querySelector('content') || xml;
 
   // Do not pars those elements.
