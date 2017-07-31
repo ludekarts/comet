@@ -38,21 +38,31 @@ export default (function EquationsLib () {
     return false;
   };
 
-  const placeEquation = (event) => {
-    const id = event.target.dataset.add;
+  const equationHandler = ({target, altKey}) => {
+    const id = target.dataset.add;
     if (!id) return;
+
+    // Remove button.
+    if (altKey) {
+      delete state.equations[add];
+      return target.parentNode.removeChild(target);
+    }
+
+    // Add equations
     const eq = state.equations[id];
     const selection = window.getSelection();
     const range = selection.getRangeAt(0);
-    const target = range.commonAncestorContainer.parentNode;
-    if (target.closest('#input')) {
+    const parent = range.commonAncestorContainer.parentNode;
+    if (parent.closest('#input')) {
       wrapp.selection(document.createTextNode(eq.latex));
     }
-    else if (target.closest('#editor')) {
-      singleMathPromise(eq.latex).then((render) => {
-        const math = wrapp.selection(wrapMath(render).firstElementChild);
-        state.onAddMathCallback && state.onAddMathCallback(math);
-      })
+    else if (parent.closest('#editor')) {
+      const math = wrapp.selection(singleMathRender(eq.latex), {
+        'class': 'jax-math',
+        'data-type': 'math',
+        'contenteditable': 'false'
+      });
+      state.onAddMathCallback && state.onAddMathCallback(math);
     }
   };
 
@@ -61,9 +71,9 @@ export default (function EquationsLib () {
   };
 
   ps.initialize(element);
-  element.addEventListener('click', placeEquation);
-  const toggle = () => element.classList.toggle('show');
+  element.addEventListener('click', equationHandler);
   const hide = () => element.classList.remove('show');
+  const toggle = () => element.classList.toggle('show');
 
   return { element, add, onAddMath, toggle, hide }
 }());

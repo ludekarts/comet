@@ -18,7 +18,8 @@
   "author": "Wojciech Ludwin, ludekarts@gmail.com",
   "license": "MIT",
   "devDependencies": {
-    "electron-prebuilt-compile": "^1.6.11"
+    "electron-prebuilt-compile": "^1.6.11",
+    "mathjax-electron": "^2.0.1"
   },
   "dependencies": {
     "perfect-scrollbar": "^0.7.1"

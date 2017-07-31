@@ -26,7 +26,7 @@ export default (function wrapp() {
     const parent = els[0].parentNode;
     if (parent) {
       const wrapper = document.createElement(type);
-      parent.insertBefore(wrapper, elements[0]);
+      parent.insertBefore(wrapper, els[0]);
       els.forEach(node => wrapper.appendChild(node));
       attrs && Object.keys(attrs).forEach(name => wrapper.setAttribute(name, attrs[name]));
       return wrapper;

@@ -1,12 +1,14 @@
 import {tempSource} from "../templates/source";
 
 // Vendors.
+import fs from 'fs';
+import {remote} from "electron";
 import ps from "perfect-scrollbar";
 
 // Components.
-import mathPanel from "./math";
 import attrsEditor from "./attrs";
 import Navigator from "./navigator";
+import equationsPanel from "./equations";
 
 // Templates.
 import {commands} from "../templates/latex";
@@ -17,9 +19,9 @@ import toHTML from "../tools/tohtml";
 import {endCaret} from "../tools/caret";
 import Keytracker from "../tools/keytracker";
 import {toXML, cleanMath} from "../tools/toxml";
-import {wrapMath, singleMathRender, updateMath} from "../tools/math";
 import {addComand, wrapCommand, switchCommands} from "../tools/cmds";
 import {loopstack, pause, debouncePromise, clipboard} from "../tools/utils";
+import {wrapMath, singleMathRender, updateMath, renderMath, singleMathPromise} from "../tools/math";
 
 // UI references.
 const workspace = document.getElementById('workspace');
@@ -27,6 +29,8 @@ const preview = document.getElementById('preview');
 const editor = document.getElementById('editor');
 const input = document.getElementById('input');
 const intro = document.getElementById('intro');
+
+const dialog = remote.dialog;
 
 // Input history.
 const recordLatexState = () => {
@@ -68,13 +72,10 @@ const checkBuffer = debouncePromise(filterCmds(commands), 300);
 
 // Append editor.
 workspace.appendChild(attrsEditor.element);
-workspace.appendChild(mathPanel.element);
+workspace.appendChild(equationsPanel.element);
 
-// Setup math renndering.
-MathJax.Hub.queue.Push(wrapMath.bind(null, editor));
-MathJax.Hub.queue.Push(navigator.select.bind(null, 'span.jax-math'));
-// MathJax.Hub.queue.Push(removeBlockage);
-
+// Add scrollbar.
+ps.initialize(editor);
 
 // Unlock edit viev
 function removeBlockage() {
@@ -138,12 +139,12 @@ function filterCmds (commands) {
 
 // Change current selected equation according to latex input.
 const updateLatex = () => {
-  mathPanel.add(input.textContent, navigator.update(input.textContent))
+  equationsPanel.add(input.textContent, navigator.update(input.textContent))
   recordXmlState();
 };
 
 // Re-render math after adding new instance to the editor.
-mathPanel.onAddMath(navigator.select.bind(null,'span.jax-math'));
+equationsPanel.onAddMath(navigator.select.bind(null,'span.jax-math'));
 
 // Undo handler.
 const restoreHistory = ({target}) => {
@@ -163,18 +164,44 @@ const exportToXML = () => {
 
 const hidePanels = () => {
   attrsEditor.hide();
-  mathPanel.hide();
+  equationsPanel.hide();
 };
 
-// Setup keyboard events.
+const parse = (xml) => {
+  editor.innerHTML = '';
+  // Append new XML.
+  editor.appendChild(toHTML(xml));
+  // Setup math renndering.
+  renderMath(editor).then(() => {
+    wrapMath(editor);
+    navigator.select('span.jax-math');
+  });
+};
+
+
+// Load XML file.
+const openXmlFile = () => {
+  dialog.showOpenDialog({ properties: ['openFile']}, (url) => {
+    if (!url) return;
+    url = url[0];
+      fs.readFile(url, 'utf8', (err, data) => {
+        if (err) throw err;
+        parse(data);
+    });
+  });
+};
+
+// ---- Setup keyboard events ------------
+
 keytracker
   .onkey('F2', updateLatex)
   .onkey('Escape', hidePanels)
   .onkey('x', 'alt', exportToXML)
+  .onkey('o', 'ctrl', openXmlFile)
   .onkey('z', 'ctrl', restoreHistory)
   .onkey('[', wrapSelectedText('[*]'))
   .onkey('Tab', '!prevent', tabThrough)
-  .onkey(' ', 'ctrl', mathPanel.toggle)
+  .onkey(' ', 'ctrl', equationsPanel.toggle)
   .onkey('Enter', 'ctrl', renderMathPrview)
   .onkey('|', 'shift', wrapSelectedText('|*|'))
   .onkey('{', 'shift', wrapSelectedText('{*}'))
@@ -222,19 +249,8 @@ const detectElement = ({target, altKey, ctrlKey}) => {
 };
 
 
-// ---- Initialization ----------------
+// ---- Event listeners ----------------
 
-editor.appendChild(toHTML(tempSource));
-ps.initialize(editor);
-
-// Set event handlers.
 editor.addEventListener('click', detectElement);
 input.addEventListener('keyup', keypressHandler);
 document.addEventListener('keydown', interceptKeys);
-
-// TODO:
-// - lista stworzonych równań
-// - zapis XML
-// - obsługa tabel
-// - obsluga linków
-// - owijanie elementów

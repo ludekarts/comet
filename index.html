@@ -11,8 +11,9 @@
         tex2jax: {inlineMath: [["$", "$"]]}
       };
     </script>
-    <link rel="stylesheet" href="app/styles/main.scss" />
-    <script src="http://localhost/projects/api/mj/mathjax/unpacked/MathJax.js?config=TeX-MML-AM_CHTML" charset="utf-8"></script>
+    <link rel="stylesheet" href="src/styles/comet.scss"/>
+    <!-- <script src="http://localhost/projects/api/mj/mathjax/unpacked/MathJax.js?config=TeX-MML-AM_CHTML" charset="utf-8"></script> -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" charset="utf-8"></script>
   </head>
   <body>
     <section id="workspace" class="workspace">
@@ -25,7 +26,7 @@
       </div>
     </section>
     <script type="text/javascript">
-      require('./app/core/comet.js');
+      require('./src/core/comet.js');
     </script>
   </body>
 </html>

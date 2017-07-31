@@ -54,7 +54,7 @@ export const singleMathPromise = (latex) => new Promise((resolve) => {
  * @return {Undefined}
  */
 export const updateMath = (latex, element) => {
-  const MathMl = MathJax.Hub.getAllJax(element)[0];  
+  const MathMl = MathJax.Hub.getAllJax(element)[0];
   if (MathMl.inputJax === 'MathML') {
     const NewJax = MathJax.Hub.getAllJax(singleMathRender(latex))[0];
     NewJax && MathMl && MathMl.Text(NewJax.root.toMathML());
@@ -66,8 +66,8 @@ export const updateMath = (latex, element) => {
 
 /**
  * Run MathJax render.
- * @param  {Function} callback Function that will be called after math is rendered.
+ * @param  {Function} callback Functions that will be called after math is rendered.
  * @return {Undefined}
  */
-const reRenderMath = (callback) =>
-  MathJax.Hub.Queue(["Typeset", MathJax.Hub, callback]);
+export const renderMath = (container) => new Promise((resolve) =>
+  MathJax.Hub.Queue(["Typeset", MathJax.Hub, container, resolve]));
