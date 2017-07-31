@@ -1,0 +1,81 @@
+/*MathPanel*/
+
+#mathPanel {
+  top: 0;
+  height: 65%;
+  width: 350px;
+  right: -400px;
+  z-index: 1000;
+  position: fixed;
+  background: #262a31;
+  transition: right .4s ease;
+  border-left: 1px solid #14171b;
+  border-bottom: 1px solid #14171b;
+}
+
+#mathPanel.show {
+  right: 0;
+}
+
+#mathPanel button {
+  color: #ccc;
+  width: 100%;
+  border: none;
+  padding: 20px;
+  display: block;
+  cursor: pointer;
+  background: none;
+  text-align: center;
+  position: relative;
+  transition: background .3s ease;
+  border-bottom: 1px solid #1c1f23;
+}
+
+#mathPanel button:before {
+  content: ' ';
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10;
+  display: block;
+  position: absolute;
+}
+
+#mathPanel button:focus {
+  outline: none;
+}
+
+#mathPanel button:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+
+/* JAX-Wrapper */
+
+span.jax-math {
+  color: #acf153;
+  position: relative;
+  display: inline-block;
+  transition: all .2s ease;
+}
+
+span.jax-math:before {
+  content: ' ';
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10;
+  display: block;
+  position: absolute;
+}
+
+span.jax-math.active {
+  color: white;
+  padding: 4px 6px;
+  border-radius: 3px;
+  transition: all .2s ease;
+  border: 1px solid #4dbd1e;
+  background: rgba(142, 222, 49, 0.2);
+}

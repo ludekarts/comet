@@ -59,10 +59,10 @@ const removeNewLines = (node) => node.parentNode.removeChild(node);
 
 // Transform <i> & <b> tags from Chrome.
 const transformEmphasis = (node) => {
-  if (node.matches('i'))
-    node.outerHTML = `<emphasis effect="italics">${node.innerHTML}</emphasis>`;
-  else if (node.matches('b'))
-    node.outerHTML = `<emphasis effect="bold">${node.innerHTML}</emphasis>`;
+  const effect = node.matches('i') ? 'italics' : 'bold';
+  const newNode = createElement(`emphasis[effect="${effect}"]`, node.innerHTML);
+  copyAttrs(node, newNode);  
+  node.outerHTML = newNode.outerHTML;
 };
 
 // Ensuea all ids are unique
@@ -107,6 +107,7 @@ export const toXML = (htmlNode) => {
 
   // Transform back some of the xml tags to be compatible with CNXML standard.
   Array.from(cnxml.querySelectorAll('reference')).forEach(transformRefs);
+  Array.from(cnxml.querySelectorAll('b, i')).forEach(transformEmphasis);
   Array.from(cnxml.querySelectorAll('math')).forEach(transformMath);
 
   // Return final CNXML.
@@ -116,7 +117,7 @@ export const toXML = (htmlNode) => {
     // Remove MathML namespace -> from MatJax math updates.
     // .replace(/\s*xmlns="http:\/\/www.w3.org\/1998\/Math\/MathML"/g, '')
     // Remove empty & active 'class' atributes.
-    replace(/\s+class=(""|"active")"/g, '')
+    .replace(/\s+class=(""|"active")"/g, '')
     // Remove all spaces between tags.
     .replace(/>\s*?</g, '><')
     // Remove all multiple spaces.

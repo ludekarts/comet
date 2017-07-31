@@ -19,3 +19,34 @@ div[data-type].active {
   border-color: #edd606;
   background: rgba(237, 214, 6, 0.1);
 }
+
+
+/* INTOR */
+
+.intro {
+  left: 0;
+  right: 0;
+  top: 45px;
+  bottom: 0;
+  color: #171b32;
+  position: fixed;
+  padding: 20px 5%;
+  background: white;
+
+  /* hide */
+  opacity: 0;
+  z-index: 0;
+  overflow: hidden;
+  visibility:hidden;
+  transform: scale(0.95) translateZ(0);
+  transition: visibility 0s linear 0.5s, opacity .3s ease, transform .3s ease;
+}
+
+.intro.show {
+  /* Show*/
+  opacity: 1;
+  z-index: 3000;
+  visibility:visible;;
+  transform: scale(1) translateZ(0);
+  transition: opacity .3s ease, transform .3s ease, visibility 0s;
+}

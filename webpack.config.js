@@ -71,7 +71,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       template: path.join(__dirname, 'src', 'index.html'),
       inject: 'body',
-      title: `☄ Comet v${version}`,
+      title: `Comet v ${version}`,
       filename: 'index.html'
     }),
     new ExtractTextPlugin({

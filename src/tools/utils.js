@@ -1,4 +1,6 @@
 
+// Transfrom array of objects in to JS object,
+// stores each entry under the key pulled from the object.
 export const arrayToObject = (array, key) =>
   array.reduce((result, object) => {
     result[object[key]] = object;
@@ -39,137 +41,19 @@ export const formatXml = (xml) => {
     // .replace(/ /g, '&nbsp;');
 };
 
+// Create random uid.
 export const uid = () =>
   'ked-' + ((+new Date) + Math.random()* 100).toString(32).replace('.', '_');
 
+// Create Element from source string.
 export const elFromString = (source) =>
   document.createRange().createContextualFragment(source);
 
-
-// Insert 'node' as a sibling of 'target' node if target is an ElementChild.
-// If target is a test node add sibling to its parent.
-export const insertSiblingNode = (target, node) => {
-  const current = target.nodeType === 3 ? target.parentNode : target;
-  const parent = current.parentNode;
-  parent.lastElementChild === current ? parent.appendChild(node) : parent.insertBefore(node, current.nextSibling);
-};
-
-// Move element which has active selection in it on level up in the DOM tree.
-export const moveElement = (stopAt, moveUp = true) => {
-  const selection = window.getSelection();
-  if (!selection.anchorNode) return false;
-
-  const current = selection.anchorNode.nodeType === 3
-    ? selection.anchorNode.parentNode
-    : selection.anchorNode;
-
-  const parent = current.parentNode;
-  if (parent.parentNode && !parent.matches(stopAt)) {
-    moveUp
-      ? parent.parentNode.insertBefore(current, parent)
-      : parent.nextElementSibling
-        ? parent.parentNode.insertBefore(current, parent.nextElementSibling)
-        : parent.parentNode.appendChild(current)
-
-    // Put carret at the begining.
-    const range = document.createRange();
-    range.setStart(current.firstChild, 0);
-    range.collapse(true);
-    selection.removeAllRanges();
-    selection.addRange(range);
-  }
-
-  return false;
-};
 
 // Move nodes 'from' node 'to' node.
 export const moveNodes = (from, to) => {
   while(from.childNodes.length > 0) to.appendChild(from.firstChild);
   return to;
-};
-
-// Set caret at the end og given element.
-export const endCaret = (element) => {
-  const selection = window.getSelection();
-  const range = document.createRange();
-  if (!element.lastChild) return;
-  try {
-    range.setStart(element.lastChild, element.lastChild.textContent.length);
-    range.collapse(true);
-    selection.removeAllRanges();
-    selection.addRange(range);
-  } catch (e) {
-    // TODO: handle this better.
-  }
-};
-
-const getNodesOut = (current) => {
-  const parent = current.parentNode;
-  let next, node = current.firstChild;
-  while (node) {
-    next = node.nextSibling;
-    parent.insertBefore(node, current);
-    node = next;
-  }
-  parent.removeChild(current);
-};
-
-// Unwrap elements that have carret on it
-export const unwrapElement = (stopAt) => {
-  const selection = window.getSelection();
-  const anchor = selection.anchorNode;
-  if (anchor && !anchor.parentNode.matches(stopAt)) getNodesOut(anchor.parentNode);
-};
-
-export const wrapSelection = (type, attrs) => {
-  const selection = window.getSelection();
-  const range = selection.getRangeAt(0);
-  const wrapper = document.createElement(type);
-  attrs && Object.keys(attrs).forEach(name => wrapper.setAttribute(name, attrs[name]));
-  range.surroundContents(wrapper);
-  return wrapper;
-};
-
-// Wrap 'elements' with HTMLElement of given 'type' with provided 'attrs'.
-// EXAMPLE: wrapElement(node, 'del', { "data-skip-merge" : true });
-export const wrapElement = (elements, type, attrs) => {
-  if (!Array.isArray(elements)) elements = [elements];
-  const parent = elements[0].parentNode;
-
-  if (parent) {
-    const wrapper = document.createElement(type);
-    parent.insertBefore(wrapper, elements[0]);
-    elements.forEach(node => wrapper.appendChild(node));
-    attrs && Object.keys(attrs).forEach(name => wrapper.setAttribute(name, attrs[name]));
-    return wrapper;
-  }
-};
-
-// Pares Equations.
-export const wrapMath = (content) => () => {
-  // Render all math and apply click wrapper.
-  MathJax.Hub.getAllJax(content).forEach(math => {
-    const equation = document.getElementById(`${math.inputID}-Frame`);
-    // MathJax generate 3 nodes per equation -> wrap them all in one.
-    if (!equation.parentNode.matches('span.flux-math')) {
-      const wrapper = wrapElement([equation.previousSibling, equation, equation.nextSibling], 'span');
-      wrapper.className = 'flux-math';
-      wrapper.dataset.type = 'math';
-      wrapper.dataset.mathId = math.inputID;
-      wrapper.setAttribute('contenteditable', false);
-    }
-  });
-};
-
-// Update Jax with given @id with new @latex formula.
-export const updateMath = (id, latex) => {
-  let found;
-  const nodeBuffer = document.createElement('span');
-  nodeBuffer.innerHTML = `$ ${latex} $`;
-  MathJax.Hub.Queue(["Typeset", MathJax.Hub, nodeBuffer]);
-  const MJNodes = MathJax.Hub.getAllJax(nodeBuffer);
-  if (MJNodes.length > 0 && MathJax.Hub.getAllJax('#content').some(math => (math.inputID === id && (found = math))))
-    found.Text(MJNodes[0].root.toMathML());
 };
 
 // Copy arributes 'from' one element 'to' another.

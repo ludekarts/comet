@@ -11,7 +11,7 @@
 
 .xmlview {
   width: 100%;
-  min-height: 60%;
+  min-height: 65%;
   position: relative;
   behavior: 'smooth';
 }
@@ -38,13 +38,14 @@
 
 .latexview {
   width: 100%;
-  min-height: 40%;
+  min-height: 35%;
 }
-
 
 #input {
   color: #ddd;
   padding: 20px;
+  overflow-y: auto;
+  max-height:  90px;
   text-align: center;
   background: #2c3035;
 }
