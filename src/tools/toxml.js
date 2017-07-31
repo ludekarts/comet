@@ -1,5 +1,5 @@
-import {createElement} from "tools/travrs";
-import {uid, copyAttrs, moveNodes} from "tools/utils";
+import {createElement} from "./travrs";
+import {uid, copyAttrs, moveNodes} from "./utils";
 
 // ---- Helpers ----------------
 
@@ -61,7 +61,7 @@ const removeNewLines = (node) => node.parentNode.removeChild(node);
 const transformEmphasis = (node) => {
   const effect = node.matches('i') ? 'italics' : 'bold';
   const newNode = createElement(`emphasis[effect="${effect}"]`, node.innerHTML);
-  copyAttrs(node, newNode);  
+  copyAttrs(node, newNode);
   node.outerHTML = newNode.outerHTML;
 };
 

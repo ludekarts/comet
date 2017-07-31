@@ -1,4 +1,4 @@
-import wrapp from "tools/wrapp";
+import wrapp from "./wrapp";
 
 /**
  * Wrap MathJax equations in clickable wrapper.
@@ -54,7 +54,7 @@ export const singleMathPromise = (latex) => new Promise((resolve) => {
  * @return {Undefined}
  */
 export const updateMath = (latex, element) => {
-  const MathMl = MathJax.Hub.getAllJax(element)[0];
+  const MathMl = MathJax.Hub.getAllJax(element)[0];  
   if (MathMl.inputJax === 'MathML') {
     const NewJax = MathJax.Hub.getAllJax(singleMathRender(latex))[0];
     NewJax && MathMl && MathMl.Text(NewJax.root.toMathML());

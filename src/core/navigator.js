@@ -1,4 +1,4 @@
-import {updateMath2, updateMath} from "tools/math";
+import {updateMath2, updateMath} from "../tools/math";
 
 export default function Navigator (selector) {
   let end, current, equations = [];

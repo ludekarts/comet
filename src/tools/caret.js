@@ -2,9 +2,9 @@
 export const endCaret = (element) => {
   const selection = window.getSelection();
   const range = document.createRange();
-  if (!element.lastChild) return;
+  const handle = element.nodeType === 3 ? element : element.lastChild;
   try {
-    range.setStart(element.lastChild, element.lastChild.textContent.length);
+    range.setStart(handle, handle.textContent.length);
     range.collapse(true);
     selection.removeAllRanges();
     selection.addRange(range);
@@ -18,9 +18,9 @@ export const endCaret = (element) => {
 export const startCaret = (element) => {
   const selection = window.getSelection();
   const range = document.createRange();
-  if (!element.firstChild) return;
+  const handle = element.nodeType === 3 ? element : element.firstChild;
   try {
-    range.setStart(element.firstChild, 0);
+    range.setStart(handle, 0);
     range.collapse(true);
     selection.removeAllRanges();
     selection.addRange(range);

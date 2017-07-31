@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Comet</title>
+    <script type="text/javascript">
+      // Configure MathJax.
+      window.MathJax = {
+        messageStyle: "none",
+        showProcessingMessages: false,
+        tex2jax: {inlineMath: [["$", "$"]]}
+      };
+    </script>
+    <link rel="stylesheet" href="src/styles/main.scss" />
+    <script src="http://localhost/projects/api/mj/mathjax/unpacked/MathJax.js?config=TeX-MML-AM_CHTML" charset="utf-8"></script>
+  </head>
+  <body>
+    <section id="workspace" class="workspace">
+      <div class="xmlview">
+        <div id="editor" contenteditable="true"></div>
+      </div>
+      <div class="latexview">
+        <div id="input" class="input" contenteditable="true"></div>
+        <div id="preview">$ $</div>
+      </div>
+    </section>
+    <script type="text/javascript">
+      require('./src/core/comet.js');
+    </script>
+  </body>
+</html>

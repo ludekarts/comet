@@ -1,10 +1,8 @@
 
-import attrStyle from "styles/attrs.css";
-
 import ps from "perfect-scrollbar";
-import {splitAt} from "tools/utils";
-import {attrsTemplates} from "temps/attrs";
-import {template, createElement} from "tools/travrs";
+import {splitAt} from "../tools/utils";
+import {attrsTemplates} from "../templates/attrs";
+import {template, createElement} from "../tools/travrs";
 
 const scaffold = `
   aside#attrseditor

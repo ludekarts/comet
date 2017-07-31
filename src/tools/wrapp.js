@@ -1,4 +1,3 @@
-import mathStyles from "styles/math.css";
 export default (function wrapp() {
 
   /**

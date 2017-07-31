@@ -1,26 +1,25 @@
-import {tempSource} from "temps/source";
+import {tempSource} from "../templates/source";
 
-// Style.
-import mainStyles from "styles/main.css";
-import cnxmlStyles from "styles/cnxml.css";
-import workspaceStyles from "styles/workspace.css";
+// Vendors.
+import ps from "perfect-scrollbar";
 
 // Components.
-import mathPanel from "core/math";
-import ps from "perfect-scrollbar";
-import {commands} from "temps/latex";
-import attrsEditor from "core/attrs";
-import Navigator from "core/navigator";
+import mathPanel from "./math";
+import attrsEditor from "./attrs";
+import Navigator from "./navigator";
+
+// Templates.
+import {commands} from "../templates/latex";
 
 // Tools.
-import wrapp from "tools/wrapp";
-import toHTML from "tools/tohtml";
-import {endCaret} from "tools/caret";
-import Keytracker from "tools/keytracker";
-import {toXML, cleanMath} from "tools/toxml";
-import {wrapMath, singleMathRender, updateMath} from "tools/math";
-import {addComand, wrapCommand, switchCommands} from "tools/cmds";
-import {loopstack, pause, debouncePromise, clipboard} from "tools/utils";
+import wrapp from "../tools/wrapp";
+import toHTML from "../tools/tohtml";
+import {endCaret} from "../tools/caret";
+import Keytracker from "../tools/keytracker";
+import {toXML, cleanMath} from "../tools/toxml";
+import {wrapMath, singleMathRender, updateMath} from "../tools/math";
+import {addComand, wrapCommand, switchCommands} from "../tools/cmds";
+import {loopstack, pause, debouncePromise, clipboard} from "../tools/utils";
 
 // UI references.
 const workspace = document.getElementById('workspace');
@@ -98,6 +97,7 @@ const tabThrough = (event) => {
     event.preventDefault();
     if (state.cmdReference) {
       state.cmdReference.textContent = state.getCommand();
+      endCaret(state.cmdReference);
       recordLatexState();
     }
   }
@@ -113,7 +113,10 @@ const tabThrough = (event) => {
 const wrapWithCommand = (buffer) => (event) => {
   if (event.target.matches('#input')) {
     event.preventDefault();
-    wrapCommand('\\mathrm', buffer).then(recordLatexState);
+    wrapCommand('\\mathrm', buffer).then( () => {
+      endCaret(state.cmdReference);
+      recordLatexState();
+    });
   }
 };
 
@@ -201,6 +204,7 @@ const keypressHandler = ({key, keyCode}) => {
           // Set global references.
           state.getCommand = switchCommands(cmds);
           state.cmdReference = addComand(cmds.slice(-1)[0], state.buffer);
+          endCaret(state.cmdReference);
         }
         state.buffer = '';
       });

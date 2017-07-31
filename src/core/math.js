@@ -1,11 +1,10 @@
-import attrStyle from "styles/math.css";
-
-import wrapp from "tools/wrapp";
 import ps from "perfect-scrollbar";
-import {endCaret} from "tools/caret";
-import {base64, uid} from "tools/utils";
-import {template, createElement} from "tools/travrs";
-import {singleMathRender, singleMathPromise, wrapMath} from "tools/math";
+
+import wrapp from "../tools/wrapp";
+import {endCaret} from "../tools/caret";
+import {base64, uid} from "../tools/utils";
+import {template, createElement} from "../tools/travrs";
+import {singleMathRender, singleMathPromise, wrapMath} from "../tools/math";
 
 const scaffold = `
   aside#mathPanel >
