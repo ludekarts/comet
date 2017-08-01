@@ -1,5 +1,5 @@
-import {copyAttrs} from "./utils";
-import {createElement} from "./travrs";
+import {copyAttrs} from "../tools/utils";
+import {createElement} from "../tools/travrs";
 
 
 // Do not pars those elements.

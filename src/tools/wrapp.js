@@ -6,7 +6,7 @@ export default (function wrapp() {
    * @return {Undefined}
    */
   const getNodesOut = (from) => {
-    if (from.children.length === 0) return from.parentNode.removeChild(from);
+    if (from.childNodes.length === 0) return from.parentNode.removeChild(from);
     from.parentNode.insertBefore(from.firstChild, from);
     getNodesOut(from);
   };
@@ -57,7 +57,11 @@ export default (function wrapp() {
 
     selectedText.length === 0
       ? range.insertNode(element)
-      : range.surroundContents(element);
+      : element.childNodes.length > 0
+        // Replace selection with complex node
+        ? (range.deleteContents(), range.insertNode(element))
+        // Wrap selection with simple node.
+        : range.surroundContents(element);
 
     return element;
   };
@@ -74,7 +78,7 @@ export default (function wrapp() {
    const remove = (element, stopAt) => {
      if (typeof element === 'string') {
        stopAt = element;
-       element = undefined;
+       element = false;
      }
      const selection = window.getSelection();
      const anchor = element ? element.firstChild : selection.anchorNode;

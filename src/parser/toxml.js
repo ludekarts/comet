@@ -1,11 +1,11 @@
-import {createElement} from "./travrs";
-import {uid, copyAttrs, moveNodes} from "./utils";
+import {createElement} from "../tools/travrs";
+import {uid, copyAttrs, moveNodes} from "../tools/utils";
 
 // ---- Helpers ----------------
 
 // Find all Bridge-MathJax elements and extract MATHML markup.
 export const cleanMath = (source) => {
-  Array.from(source.querySelectorAll('span.flux-math')).forEach(element => {
+  Array.from(source.querySelectorAll('span.jax-math')).forEach(element => {
     const parent = element.parentNode;
     parent.insertBefore(document.createRange().createContextualFragment(element.querySelector('script').textContent), element);
     parent.removeChild(element);

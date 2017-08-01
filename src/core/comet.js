@@ -6,19 +6,20 @@ import {remote} from "electron";
 import ps from "perfect-scrollbar";
 
 // Components.
-import attrsEditor from "./attrs";
+import Wrapper from "./wrapper";
+import AttrsEditor from "./attrs";
 import Navigator from "./navigator";
-import equationsPanel from "./equations";
+import EquationsPanel from "./equations";
 
 // Templates.
 import {commands} from "../templates/latex";
 
 // Tools.
 import wrapp from "../tools/wrapp";
-import toHTML from "../tools/tohtml";
+import toHTML from "../parser/tohtml";
 import {endCaret} from "../tools/caret";
 import Keytracker from "../tools/keytracker";
-import {toXML, cleanMath} from "../tools/toxml";
+import {toXML, cleanMath} from "../parser/toxml";
 import {addComand, wrapCommand, switchCommands} from "../tools/cmds";
 import {loopstack, pause, debouncePromise, clipboard} from "../tools/utils";
 import {wrapMath, singleMathRender, updateMath, renderMath, singleMathPromise} from "../tools/math";
@@ -71,8 +72,10 @@ const saveLatexHistory = pause(recordLatexState, 1500);
 const checkBuffer = debouncePromise(filterCmds(commands), 300);
 
 // Append editor.
-workspace.appendChild(attrsEditor.element);
-workspace.appendChild(equationsPanel.element);
+workspace.appendChild(Wrapper.element);
+workspace.appendChild(AttrsEditor.element);
+workspace.appendChild(EquationsPanel.element);
+workspace.appendChild(EquationsPanel.element);
 
 // Add scrollbar.
 ps.initialize(editor);
@@ -139,12 +142,12 @@ function filterCmds (commands) {
 
 // Change current selected equation according to latex input.
 const updateLatex = () => {
-  equationsPanel.add(input.textContent, navigator.update(input.textContent))
+  EquationsPanel.add(input.textContent, navigator.update(input.textContent))
   recordXmlState();
 };
 
 // Re-render math after adding new instance to the editor.
-equationsPanel.onAddMath(navigator.select.bind(null,'span.jax-math'));
+EquationsPanel.onAddMath(navigator.select.bind(null,'span.jax-math'));
 
 // Undo handler.
 const restoreHistory = ({target}) => {
@@ -163,19 +166,24 @@ const exportToXML = () => {
 };
 
 const hidePanels = () => {
-  attrsEditor.hide();
-  equationsPanel.hide();
+  Wrapper.hide();
+  AttrsEditor.hide();
+  EquationsPanel.hide();
 };
+
+function reRenderMath() {
+  renderMath(editor).then(() => {
+    wrapMath(editor);
+    navigator.select('span.jax-math');
+  });
+}
 
 const parse = (xml) => {
   editor.innerHTML = '';
   // Append new XML.
   editor.appendChild(toHTML(xml));
   // Setup math renndering.
-  renderMath(editor).then(() => {
-    wrapMath(editor);
-    navigator.select('span.jax-math');
-  });
+  reRenderMath();
 };
 
 
@@ -198,14 +206,16 @@ keytracker
   .onkey('Escape', hidePanels)
   .onkey('x', 'alt', exportToXML)
   .onkey('o', 'ctrl', openXmlFile)
+  .onkey('w', 'alt', Wrapper.show)
   .onkey('z', 'ctrl', restoreHistory)
   .onkey('[', wrapSelectedText('[*]'))
   .onkey('Tab', '!prevent', tabThrough)
-  .onkey(' ', 'ctrl', equationsPanel.toggle)
+  .onkey(' ', 'ctrl', EquationsPanel.toggle)
   .onkey('Enter', 'ctrl', renderMathPrview)
   .onkey('|', 'shift', wrapSelectedText('|*|'))
   .onkey('{', 'shift', wrapSelectedText('{*}'))
   .onkey('(', 'shift', wrapSelectedText('(*)'))
+  .onkey('q', 'alt', wrapp.remove.bind(null, '#editor'))
   .onkey('ArrowUp', 'alt', wrapSelectedText('\\left*\\right'))
   .onkey('i', 'ctrl', '!prevent', wrapWithCommand(state.buffer));
 
@@ -242,10 +252,14 @@ const keypressHandler = ({key, keyCode}) => {
 // Detect element clicked with Alt key.
 const detectElement = ({target, altKey, ctrlKey}) => {
   const isMath = target.matches('span.jax-math');
-  if (altKey && isMath) navigator.set(target)
-  if (altKey && !isMath) attrsEditor.select(target);
-  if (ctrlKey && isMath) clip(target.querySelector('script').innerHTML);
+  // Activate math element.
+  if (altKey && isMath) navigator.set(target);
+  // Open Attribute editor.
+  if (altKey && !isMath) AttrsEditor.select(target);
+  // Copy element ID.
   if (ctrlKey && !isMath && target.id) clip(target.id);
+  // Copy MML to the clipboard
+  if (ctrlKey && isMath) clip(target.querySelector('script').innerHTML);
 };
 
 
