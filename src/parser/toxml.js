@@ -5,10 +5,11 @@ import {uid, copyAttrs, moveNodes} from "../tools/utils";
 
 // Find all Bridge-MathJax elements and extract MATHML markup.
 export const cleanMath = (source) => {
-  Array.from(source.querySelectorAll('span.jax-math')).forEach(element => {
+  Array.from(source.querySelectorAll('span[data-mathml]')).forEach(element => {
     const parent = element.parentNode;
-    parent.insertBefore(document.createRange().createContextualFragment(element.querySelector('script').textContent), element);
-    parent.removeChild(element);
+    const root = parent.parentNode;
+    root.insertBefore(document.createRange().createContextualFragment(element.dataset.mathml), parent);
+    root.removeChild(parent);
   });
   return source;
 };

@@ -82,7 +82,7 @@ export default (function wrapp() {
      }
      const selection = window.getSelection();
      const anchor = element ? element.firstChild : selection.anchorNode;
-     if (anchor && !anchor.parentNode.matches(stopAt)) getNodesOut(anchor.parentNode);
+     if (anchor && (!stopAt ? true : !anchor.parentNode.matches(stopAt))) getNodesOut(anchor.parentNode);
    };
 
 

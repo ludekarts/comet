@@ -21,12 +21,16 @@ import {endCaret} from "../tools/caret";
 import Keytracker from "../tools/keytracker";
 import {toXML, cleanMath} from "../parser/toxml";
 import {addComand, wrapCommand, switchCommands} from "../tools/cmds";
-import {loopstack, pause, debouncePromise, clipboard} from "../tools/utils";
+import {loopstack, pause, debounce, debouncePromise, clipboard, formatXml} from "../tools/utils";
 import {wrapMath, singleMathRender, updateMath, renderMath, singleMathPromise} from "../tools/math";
 
 // UI references.
+const introClose = document.getElementById('introClose');
 const workspace = document.getElementById('workspace');
+const outClose = document.getElementById('outClose');
+const controls = document.getElementById('controls');
 const preview = document.getElementById('preview');
+const output = document.getElementById('output');
 const editor = document.getElementById('editor');
 const input = document.getElementById('input');
 const intro = document.getElementById('intro');
@@ -70,6 +74,7 @@ const renderXMLMath = wrapMath(editor);
 const saveXmlHistory = pause(recordXmlState, 1000);
 const saveLatexHistory = pause(recordLatexState, 1500);
 const checkBuffer = debouncePromise(filterCmds(commands), 300);
+const renderMathPrview = debounce(() => updateMath(input.textContent, preview), 500);
 
 // Append editor.
 workspace.appendChild(Wrapper.element);
@@ -79,14 +84,8 @@ workspace.appendChild(EquationsPanel.element);
 
 // Add scrollbar.
 ps.initialize(editor);
+ps.initialize(intro.querySelector('.intro-content'));
 
-// Unlock edit viev
-function removeBlockage() {
-  intro.classList.remove('show');
-}
-
-// Remder LaTeX equation.
-const renderMathPrview = () => updateMath(input.textContent, preview);
 
 // Wrap selection with wrappers.
 const wrapSelectedText = (template) => () => {
@@ -139,7 +138,6 @@ function filterCmds (commands) {
   };
 };
 
-
 // Change current selected equation according to latex input.
 const updateLatex = () => {
   EquationsPanel.add(input.textContent, navigator.update(input.textContent))
@@ -147,6 +145,7 @@ const updateLatex = () => {
 };
 
 // Re-render math after adding new instance to the editor.
+Wrapper.onAddMath(navigator.select.bind(null,'span.jax-math'));
 EquationsPanel.onAddMath(navigator.select.bind(null,'span.jax-math'));
 
 // Undo handler.
@@ -160,9 +159,9 @@ const restoreHistory = ({target}) => {
   }
 };
 
-
 const exportToXML = () => {
-  console.log(toXML(cleanMath(editor.firstElementChild.cloneNode(true))));
+  output.firstElementChild.value = formatXml(toXML(cleanMath(editor.firstElementChild.cloneNode(true))));
+  output.classList.add('show');
 };
 
 const hidePanels = () => {
@@ -184,8 +183,15 @@ const parse = (xml) => {
   editor.appendChild(toHTML(xml));
   // Setup math renndering.
   reRenderMath();
+  // Hide help panel.
+  toggleIntro(false);
+  // Inintil Histroy state.
+  recordXmlState();
 };
 
+const closeOutput = () => {
+  output.classList.remove('show');
+};
 
 // Load XML file.
 const openXmlFile = () => {
@@ -199,6 +205,21 @@ const openXmlFile = () => {
   });
 };
 
+const toggleIntro = (flag) => {
+  if (flag === undefined) intro.classList.toggle('show');
+  else if (flag === true) intro.classList.add('show');
+  else if (flag === false) intro.classList.remove('show');
+}
+
+// Handle controll buttons.
+const controler = ({target}) => {
+  const action = target.dataset.action;
+  if (action === 'out') exportToXML();
+  if (action === 'help') toggleIntro(true);
+  if (action === 'eq') EquationsPanel.toggle();
+};
+
+
 // ---- Setup keyboard events ------------
 
 keytracker
@@ -211,7 +232,6 @@ keytracker
   .onkey('[', wrapSelectedText('[*]'))
   .onkey('Tab', '!prevent', tabThrough)
   .onkey(' ', 'ctrl', EquationsPanel.toggle)
-  .onkey('Enter', 'ctrl', renderMathPrview)
   .onkey('|', 'shift', wrapSelectedText('|*|'))
   .onkey('{', 'shift', wrapSelectedText('{*}'))
   .onkey('(', 'shift', wrapSelectedText('(*)'))
@@ -229,6 +249,7 @@ const interceptKeys = (event) => {
     if (target.matches('#input')) saveLatexHistory();
     else if (target.matches('#editor')) saveXmlHistory();
   }
+  renderMathPrview();
   keytracker.test(event);
 };
 
@@ -253,18 +274,21 @@ const keypressHandler = ({key, keyCode}) => {
 const detectElement = ({target, altKey, ctrlKey}) => {
   const isMath = target.matches('span.jax-math');
   // Activate math element.
-  if (altKey && isMath) navigator.set(target);
-  // Open Attribute editor.
-  if (altKey && !isMath) AttrsEditor.select(target);
+  if (isMath) navigator.set(target);
   // Copy element ID.
   if (ctrlKey && !isMath && target.id) clip(target.id);
   // Copy MML to the clipboard
   if (ctrlKey && isMath) clip(target.querySelector('script').innerHTML);
+  // Open Attribute editor.
+  if (altKey && !isMath) (AttrsEditor.select(target), EquationsPanel.hide());
 };
 
 
 // ---- Event listeners ----------------
 
+controls.addEventListener('click', controler);
+outClose.addEventListener('click', closeOutput);
 editor.addEventListener('click', detectElement);
 input.addEventListener('keyup', keypressHandler);
 document.addEventListener('keydown', interceptKeys);
+introClose.addEventListener('click', toggleIntro.bind(null, false));

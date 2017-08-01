@@ -39,6 +39,17 @@
 .latexview {
   width: 100%;
   min-height: 35%;
+
+  & .buttons {
+    right: 0;
+    bottom: 35%;
+    z-index: 3000;
+    position: fixed;
+
+    &:focus {
+      outline: none;
+    }
+  }
 }
 
 #input {
@@ -58,4 +69,31 @@
   color: #ddd;
   padding: 20px;
   text-align: center;
+}
+
+
+/* BUTTIONS */
+
+.cbtn {
+  float: left;
+  padding: 3px;
+  display: block;
+  color: #21252b;
+  cursor: pointer;
+  border-right: none;
+  border: 1px solid #14171b;
+  transition: background .3s ease;
+  background: rgba(239, 210, 10, 0.9);
+
+  &:focus {
+    outline: none;
+  }
+
+  &:last-child {
+    border-right:  1px solid #14171b;
+  }
+
+  &:hover {
+    background: rgba(239, 210, 10, 0.35);
+  }
 }

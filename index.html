@@ -11,7 +11,7 @@
         tex2jax: {inlineMath: [["$", "$"]]}
       };
     </script>
-    <link rel="stylesheet" href="src/styles/comet.scss"/>
+    <link rel="stylesheet" href="src/styles/main.scss"/>
     <!-- <script src="http://localhost/projects/api/mj/mathjax/unpacked/MathJax.js?config=TeX-MML-AM_CHTML" charset="utf-8"></script> -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" charset="utf-8"></script>
   </head>
@@ -21,8 +21,59 @@
         <div id="editor" contenteditable="true"></div>
       </div>
       <div class="latexview">
-        <div id="input" class="input" contenteditable="true"></div>
-        <div id="preview">$ $</div>
+        <div id="controls" class="buttons">
+          <button class="cbtn" data-action="out">Output</button>
+          <button class="cbtn" data-action="help">Help</button>
+          <button class="cbtn" data-action="eq">Equations</button>
+        </div>
+        <div id="input" class="input" contenteditable="true">LaTeX</div>
+        <div id="preview">$LaTeX$</div>
+      </div>
+    </section>
+    <section id="output" class="output">
+      <textarea class="cnxmlout"></textarea>
+      <button id="outClose">Close</button>
+    </section>
+
+    <section id="intro" class="intro show">
+      <h2><img src="src/icons/comet.svg" alt=""><span class="cm">Comet</span>  <button id="introClose">×</button></h2>
+      <hr>
+      <div class="intro-content">
+        <h3>Manual</h3>
+
+        <h4>Keyboard shortcuts</h4>
+        <ul>
+          <li><code>F2</code> - Replace active Math element with LaTeX formula</li>
+          <li><code>Tab</code> - When fous on XML, tabs through math elements</li>
+          <li><code>Tab</code> - When fous on LaTeX, tabs through LaTeX formuas matches to user's input</li>
+          <li><code>Esc</code> - Close any popup</li>
+
+          <li><code>Ctrl + O</code> - Open new XML file</li>
+          <li><code>Ctrl + Z</code> - When fous on XML it undo edit action on XML content</li>
+          <li><code>Ctrl + Z</code> - When fous on LaTeX it undo edit action on LaTeX input</li>
+          <li><code>Ctrl + Space</code> - Toggle equations lobrary</li>
+
+          <li><code>Alt + X</code> - Display output XML</li>
+          <li><code>Alt + W</code> - Wrap selected text in provided element or template</li>
+          <li><code>Alt + Q</code> - Unwrap element with caret in it</li>
+        </ul>
+        <h4>Elements features</h4>
+        <ul>
+          <li><code>Ctrl + XML Element</code> - Get element ID</li>
+          <li><code>Ctrl + Math Element</code> - Copy MathML markup to the clipboard</li>
+          <li><code>Alt + XML Element</code> - Open attributes panel</li>
+        </ul>
+        <h4>Wrappers</h4>
+        <ul>
+          <li><code>[</code> - Puts open & closing bracket, it also wraps selected text with this bracktets</li>
+          <li><code>{</code> - Puts open & closing bracket, it also wraps selected text with this bracktets</li>
+          <li><code>(</code> - Puts open & closing bracket, it also wraps selected text with this bracktets</li>
+          <li><code>|</code> - Puts open & closing pipe, it also wraps selected text with the pipes</li>
+          <li><code>Alt + ↑</code> - Wraps selected text with <code>\left \right</code> operator</li>
+          <li><code>Ctrl + i</code> - When used on selected text in XML content wraps it in italic styles</li>
+          <li><code>Ctrl + i</code> - When used on selected text in XML content wraps it in italic styles</li>
+          <li><code>Ctrl + i</code> - When used on selected text in LaTeX input wraps text in <code>\mathrm {}</code> operator</li>
+        </ul>
       </div>
     </section>
     <script type="text/javascript">
