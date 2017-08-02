@@ -1,7 +1,7 @@
 
 import ps from "perfect-scrollbar";
-import {splitAt} from "../tools/utils";
 import {attrsTemplates} from "../templates/attrs";
+import {splitAt, inDeltaTime} from "../tools/utils";
 import {template, createElement} from "../tools/travrs";
 
 const scaffold = `
@@ -25,7 +25,7 @@ export default (function AttrsEditor () {
   };
 
   const refs = {
-    entries: createElement('form'),
+    entries: createElement('form[onsubmit="\"return false;\""]'),
     input: createElement('input.input[type="text"]'),
     addAttrs: createElement('button.addAttrs', '+'),
     saveAttrs: createElement('button.saveAttrs', '✔')
@@ -90,20 +90,18 @@ export default (function AttrsEditor () {
       refs.entries.removeChild(target.parentNode);
     }
     // Save attributes. Shift + Enter.
-    if (shiftKey && keyCode === 13 && target.matches('input.entry')) {
-      saveAttributes();
-    }
-    else if (keyCode === 13 && target.matches('input.input')) {
-      addAttribute();
-    }
+    if (keyCode === 13 && target.matches('input.input')) addAttribute();
+    else if (keyCode === 13 && !target.matches('input.input')) doubleEnter();
   };
+
+  const doubleEnter = inDeltaTime(saveAttributes, 250);
 
   const hide = () => {
     element.classList.remove('show');
     state.currentElement.classList.remove('active');
   };
 
-  element.addEventListener('keydown', keyboardHandler);
+  document.addEventListener('keydown', keyboardHandler);
   refs.addAttrs.addEventListener('click', addAttribute);
   refs.saveAttrs.addEventListener('click', saveAttributes);
 

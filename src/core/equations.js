@@ -44,7 +44,9 @@ export default (function EquationsLib () {
 
     // Remove button.
     if (altKey) {
-      delete state.equations[add];
+      const index = state.hashes.indexOf(base64(state.equations[id].mml));
+      state.hashes.splice(index, 1);
+      delete state.equations[id];      
       return target.parentNode.removeChild(target);
     }
 

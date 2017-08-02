@@ -8,7 +8,7 @@ export const endCaret = (element) => {
     range.collapse(true);
     selection.removeAllRanges();
     selection.addRange(range);
-  } catch (e) {
+  } catch (e) {    
     // TODO: handle this better.
   }
 };

@@ -11,7 +11,7 @@
         tex2jax: {inlineMath: [["$", "$"]]}
       };
     </script>
-    <link rel="stylesheet" href="src/styles/main.scss"/>
+    <link rel="stylesheet" href="styles/main.scss"/>
     <!-- <script src="http://localhost/projects/api/mj/mathjax/unpacked/MathJax.js?config=TeX-MML-AM_CHTML" charset="utf-8"></script> -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" charset="utf-8"></script>
   </head>
@@ -36,12 +36,14 @@
     </section>
 
     <section id="intro" class="intro show">
-      <h2><img src="src/icons/comet.svg" alt=""><span class="cm">Comet</span>  <button id="introClose">×</button></h2>
+      <h2><img src="icons/comet.svg" alt=""><span class="cm">Comet</span>  <button id="introClose">×</button></h2>
       <hr>
       <div class="intro-content">
         <h3>Manual</h3>
+        <p>To <u>Quick Start</u> press <code>Ctrl + O</code> to pick <u>XML</u> file to precess.</p>
+        <br>
 
-        <h4>Keyboard shortcuts</h4>
+        <h4>Main keyboard shortcuts</h4>
         <ul>
           <li><code>F2</code> - Replace active Math element with LaTeX formula</li>
           <li><code>Tab</code> - When fous on XML, tabs through math elements</li>
@@ -57,12 +59,30 @@
           <li><code>Alt + W</code> - Wrap selected text in provided element or template</li>
           <li><code>Alt + Q</code> - Unwrap element with caret in it</li>
         </ul>
+
         <h4>Elements features</h4>
         <ul>
           <li><code>Ctrl + XML Element</code> - Get element ID</li>
-          <li><code>Ctrl + Math Element</code> - Copy MathML markup to the clipboard</li>
           <li><code>Alt + XML Element</code> - Open attributes panel</li>
+          <li><code>Ctrl + Math Element</code> - Copy MathML markup to the clipboard</li>
         </ul>
+
+        <h4>Attributes Panel</h4>
+        <p>
+          To <u>add</u> or <u>edit</u> an attribute, you need to click on the XML element holding <u>Alt</u> key.
+          Then on the top input in <u>Attributes Panel</u> type the name of the attribute then <code>=</code> and value of the attribute.
+          E.g. <code>name=John</code> After that press <u>Enter</u> to create attibute entry.
+        </p>
+
+        <p>
+          Attributes Panel allows you to use <u>attribute templates</u>. They can provide a sets of predefined attibutes for the elements.
+          To use any of them type on the top input <code>@</code> then name of the template. E.g. <code>@link</code>
+        </p>
+        <ul>
+          <li><code>Double Enter Press</code> - Save atributes for the element</li>
+          <li><code>Shift + Del</code> - When caret is on the attribute input, removes this attribute</li>
+        </ul>
+
         <h4>Wrappers</h4>
         <ul>
           <li><code>[</code> - Puts open & closing bracket, it also wraps selected text with this bracktets</li>
@@ -71,13 +91,20 @@
           <li><code>|</code> - Puts open & closing pipe, it also wraps selected text with the pipes</li>
           <li><code>Alt + ↑</code> - Wraps selected text with <code>\left \right</code> operator</li>
           <li><code>Ctrl + i</code> - When used on selected text in XML content wraps it in italic styles</li>
-          <li><code>Ctrl + i</code> - When used on selected text in XML content wraps it in italic styles</li>
           <li><code>Ctrl + i</code> - When used on selected text in LaTeX input wraps text in <code>\mathrm {}</code> operator</li>
+        </ul>
+
+        <h4>Available element templates</h4>
+        <ul>
+          <li><code>@ext</code> - <code class="pre">&lt;link document="docID" target-id="ID" /&gt;</code></li>
+          <li><code>@chap</code> - <code class="pre">&lt;link document="docID" class="target-chapter" /&gt;</code></li>
+          <li><code>@link</code> - <code class="pre">&lt;link target-id="ID" xmlns:cmlnle="http://katalysteducation.org/cmlnle/1.0" cmlnle:template="Rysunku %n" /&gt;</code></li>
+          <li><code>@term</code> - <code class="pre">&lt;term xmlns:cmlnle="http://katalysteducation.org/cmlnle/1.0" cmlnle:reference="form" &gt;TREM&lt;/term&gt;</code></li>
         </ul>
       </div>
     </section>
     <script type="text/javascript">
-      require('./src/core/comet.js');
+      require('./core/comet.js');
     </script>
   </body>
 </html>

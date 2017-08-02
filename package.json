@@ -1,10 +1,12 @@
 {
   "name": "comet",
   "version": "0.1.0",
-  "description": "Tool for editing MML equations in CNXML documents.",
-  "main": "main.js",
+  "description": "Tool for editing MML equations in CNXML documents, and more.",
+  "main": "src/main.js",
   "scripts": {
-    "start": "electron .",
+    "make": "electron-forge make",
+    "start": "electron-forge start",
+    "package": "electron-forge package",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
@@ -18,10 +20,46 @@
   "author": "Wojciech Ludwin, ludekarts@gmail.com",
   "license": "MIT",
   "devDependencies": {
-    "electron-prebuilt-compile": "^1.6.11",
-    "mathjax-electron": "^2.0.1"
+    "babel-plugin-transform-async-to-generator": "^6.24.1",
+    "babel-preset-env": "^1.6.0",
+    "babel-preset-react": "^6.24.1",
+    "electron-forge": "^3.1.0",
+    "electron-prebuilt-compile": "1.6.11"
   },
   "dependencies": {
+    "electron-compile": "^6.4.1",
     "perfect-scrollbar": "^0.7.1"
+  },
+  "config": {
+    "forge": {
+      "make_targets": {
+        "win32": [
+          "squirrel"
+        ],
+        "darwin": [
+          "zip"
+        ],
+        "linux": [
+          "deb",
+          "rpm"
+        ]
+      },
+      "electronPackagerConfig": {
+        "icon": "src/icons/png/64x64.png"
+      },
+      "electronWinstallerConfig": {
+        "name": "Comet",
+        "icon": "src/icons/win/icon.ico"
+      },
+      "electronInstallerDebian": {},
+      "electronInstallerRedhat": {},
+      "github_repository": {
+        "owner": "ludekarts",
+        "name": "comet"
+      },
+      "windowsStoreConfig": {
+        "packageName": ""
+      }
+    }
   }
 }

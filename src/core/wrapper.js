@@ -1,7 +1,7 @@
 import wrapp from "../tools/wrapp";
 import {singleMathRender} from "../tools/math";
+import {attrsTemplates} from "../templates/attrs";
 import {template, createElement} from "../tools/travrs";
-
 
 const scaffold = `
   div.nodeWrapper >
@@ -17,9 +17,21 @@ export default (function Wrapper () {
   const refs = { input: createElement('input') };
   const element = template(refs, scaffold);
 
+  const attrsFromTemplate = (attrs, input, excluded = []) => {
+    return ((attrs[input.slice(1, input.length)] || '')
+      .match(/[\w-:]+=".+?"/g) || [])
+      .map(el => el.replace(/"/g,'').split('='))
+      .filter(([name]) => !~excluded.indexOf(name))
+  };
 
   const getElement = (label) => {
-    return createElement(label);
+    // Handle templates.
+    if (label.indexOf('@') === 0) {
+      const node = createElement(label.slice(1, label.length));
+      attrsFromTemplate(attrsTemplates, label).forEach(([name, value]) => node.setAttribute(name, value));
+      return node;
+    }
+    else return createElement((label === 'link') ? 'reference' : link);
   };
 
   const wrapWithMath = () => {

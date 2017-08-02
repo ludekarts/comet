@@ -116,9 +116,9 @@ const tabThrough = (event) => {
 const wrapWithCommand = (buffer) => (event) => {
   if (event.target.matches('#input')) {
     event.preventDefault();
-    wrapCommand('\\mathrm', buffer).then( () => {
-      endCaret(state.cmdReference);
+    wrapCommand('\\mathrm', buffer).then((node) => {
       recordLatexState();
+      endCaret(node);
     });
   }
 };
@@ -195,7 +195,13 @@ const closeOutput = () => {
 
 // Load XML file.
 const openXmlFile = () => {
-  dialog.showOpenDialog({ properties: ['openFile']}, (url) => {
+  dialog.showOpenDialog({
+    properties: ['openFile'],
+    filters: [{
+      name: 'Xml',
+      extensions: ['xml', 'cnxml']
+    }]
+  }, (url) => {
     if (!url) return;
     url = url[0];
       fs.readFile(url, 'utf8', (err, data) => {
@@ -277,10 +283,10 @@ const detectElement = ({target, altKey, ctrlKey}) => {
   if (isMath) navigator.set(target);
   // Copy element ID.
   if (ctrlKey && !isMath && target.id) clip(target.id);
-  // Copy MML to the clipboard
-  if (ctrlKey && isMath) clip(target.querySelector('script').innerHTML);
   // Open Attribute editor.
   if (altKey && !isMath) (AttrsEditor.select(target), EquationsPanel.hide());
+  // Copy MML to the clipboard
+  if (ctrlKey && isMath) clip(target.querySelector('span[data-mathml]').dataset.mathml);
 };
 
 

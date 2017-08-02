@@ -17,8 +17,7 @@ export const wrapCommand = (command, buffer) => new Promise((resolve) => {
   const range = selection.getRangeAt(0);
   const selectedText = range.toString();
   range.deleteContents();
-  addComand(command, buffer, selectedText);
-  resolve();
+  resolve(addComand(command, buffer, selectedText));
 });
 
 export const switchCommands = (commands) => {

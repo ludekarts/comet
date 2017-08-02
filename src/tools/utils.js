@@ -112,6 +112,20 @@ export const pause = (callback, wait) => {
   };
 };
 
+// Call callback function if it is called within delta time range.
+export const inDeltaTime = (callback, delta) => {
+  let startTime, currentTime = 0;
+  return (...args) => {
+    startTime = new Date();
+    if (startTime - currentTime <= delta) {
+      callback.apply(this, args);
+      startTime = 0;
+    }
+    currentTime = startTime;
+  }
+};
+
+
 // Create a looping stack.
 export const loopstack = (length, counter = 0) => {
   const stack = new Array(length);

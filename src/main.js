@@ -1,4 +1,4 @@
-import {enableLiveReload} from 'electron-compile';
+// import {enableLiveReload} from 'electron-compile';
 const {app, BrowserWindow} = require('electron');
 const path = require('path');
 const url = require('url');
@@ -10,13 +10,13 @@ let win;
 function createWindow () {
 
   // Enabel Live reload.
-  enableLiveReload();
+  // enableLiveReload();
 
   // Create the browser window.
   win = new BrowserWindow({
     width: 1200,
     height: 700,
-    icon: path.join(__dirname, 'src/icons/png/64x64.png')
+    icon: path.join(__dirname, 'icons/png/64x64.png')
   });
 
   // and load the index.html of the app.
@@ -27,7 +27,7 @@ function createWindow () {
   }));
 
   // Open the DevTools.
-  win.webContents.openDevTools();
+  // win.webContents.openDevTools();
 
   // Emitted when the window is closed.
   win.on('closed', () => win = null);
