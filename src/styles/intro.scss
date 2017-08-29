@@ -36,6 +36,10 @@
 
   li {
     margin: 7px 0;
+    & > code {
+      margin-top: 5px;
+      display: inline-block;
+    }
   }
 
   h3 {
@@ -53,7 +57,7 @@
     max-width: 35px;
   }
 
-  code {    
+  code {
     font-weight: bold;
     border-radius: 2px;
     background: #414954;

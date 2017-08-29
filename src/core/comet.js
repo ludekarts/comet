@@ -1,4 +1,3 @@
-import {tempSource} from "../templates/source";
 
 // Vendors.
 import fs from 'fs';
@@ -181,12 +180,12 @@ const parse = (xml) => {
   editor.innerHTML = '';
   // Append new XML.
   editor.appendChild(toHTML(xml));
+  // Inintil Histroy state.
+  recordXmlState();
   // Setup math renndering.
   reRenderMath();
   // Hide help panel.
   toggleIntro(false);
-  // Inintil Histroy state.
-  recordXmlState();
 };
 
 const closeOutput = () => {

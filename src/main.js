@@ -1,4 +1,4 @@
-// import {enableLiveReload} from 'electron-compile';
+import {enableLiveReload} from 'electron-compile';
 const {app, BrowserWindow} = require('electron');
 const path = require('path');
 const url = require('url');
@@ -8,9 +8,6 @@ const url = require('url');
 let win;
 
 function createWindow () {
-
-  // Enabel Live reload.
-  // enableLiveReload();
 
   // Create the browser window.
   win = new BrowserWindow({
@@ -26,11 +23,11 @@ function createWindow () {
     slashes: true
   }));
 
-  // Open the DevTools.
-  // win.webContents.openDevTools();
-
   // Emitted when the window is closed.
   win.on('closed', () => win = null);
+
+  // Enabel Live reload & Open the DevTools.
+  enableLiveReload() && win.webContents.openDevTools();
 }
 
 // This method will be called when Electron has finished

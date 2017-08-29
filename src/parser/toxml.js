@@ -11,6 +11,7 @@ export const cleanMath = (source) => {
     root.insertBefore(document.createRange().createContextualFragment(element.dataset.mathml), parent);
     root.removeChild(parent);
   });
+
   return source;
 };
 
@@ -66,7 +67,7 @@ const transformEmphasis = (node) => {
   node.outerHTML = newNode.outerHTML;
 };
 
-// Ensuea all ids are unique
+// Ensure all ids are unique.
 const transformUniqueIds = (collection = []) => (node) => {
   if (!~collection.indexOf(node.id)) collection.push(node.id) ;
   else {
@@ -91,6 +92,7 @@ export const toXML = (htmlNode) => {
   // to translate CNXML elements that aren't compatible with HTML5
   const firstElement = sourceClone.firstElementChild.cloneNode();
   const root = createElement(firstElement.dataset.type || 'div');
+
   copyAttrs(firstElement, root, ['data-type']);
 
   const xml = clone(sourceClone.firstElementChild, root).outerHTML
@@ -98,8 +100,11 @@ export const toXML = (htmlNode) => {
     .replace(/<x-|<\/x-/g, (x) => ~x.indexOf('<\/') ? '</' : '<')
     // Close <img> tags.
     .replace(/<img(.*?)>/g, (a, attrs) => `<image${attrs}/>`)
+    // Replace custim namespaces from templates.
+    .replace(/::.*?="/g, match => match.replace('::', ':'))
     // Remove all non-breaking sapces.
     .replace(/&nbsp;/g, ' ');
+
 
   // Instantiate XML barser & serializer.
   const parser = new DOMParser();
@@ -116,9 +121,9 @@ export const toXML = (htmlNode) => {
     // Remove unecesery xml namesapces form CNXML elements -> Leftovers from parsing & editing.
     .replace(/xmlns="http:\/\/www\.w3\.org\/1999\/xhtml"/g, '')
     // Remove MathML namespace -> from MatJax math updates.
-    // .replace(/\s*xmlns="http:\/\/www.w3.org\/1998\/Math\/MathML"/g, '')
-    // Remove empty & active 'class' atributes.
-    .replace(/\s+class=(""|"active")"/g, '')
+    .replace(/\s*xmlns="http:\/\/www.w3.org\/1998\/Math\/MathML"/g, '')
+    // Remove empty, active and Mathjax special 'class' atributes.
+    .replace(/\s+class=(""|"active"|"MJX.*?")/g, '')
     // Remove all spaces between tags.
     .replace(/>\s*?</g, '><')
     // Remove all multiple spaces.
