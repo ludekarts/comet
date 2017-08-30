@@ -29,7 +29,7 @@ export const wrapMath = (content) => {
  */
 export const singleMathRender = (latex) => {
   const nodeBuffer = document.createElement('span');
-  nodeBuffer.innerHTML = `$${latex}$`;
+  nodeBuffer.textContent = `$${latex}$`;
   MathJax.Hub.Queue(["Typeset", MathJax.Hub, nodeBuffer]);
   return nodeBuffer;
 };
@@ -57,7 +57,8 @@ export const updateMath = (latex, element) => {
   const MathMl = MathJax.Hub.getAllJax(element)[0];
   if (MathMl.inputJax === 'MathML') {
     const NewJax = MathJax.Hub.getAllJax(singleMathRender(latex))[0];
-    NewJax && MathMl && MathMl.Text(NewJax.root.toMathML());
+    if (NewJax && MathMl) MathMl.Text(NewJax.root.toMathML());
+    else return;
   }
   else MathMl.Text(latex);
   return element;

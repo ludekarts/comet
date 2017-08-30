@@ -63,7 +63,7 @@ export default (function Wrapper () {
     if (keyCode === 13) {
       const range = new Range();
       range.selectNodeContents(state.currentTarget);
-      refs.input.value === 'm'
+      refs.input.value === '@m'
         ? wrapWithMath()
         : (range.surroundContents(getElement(refs.input.value)), wrapp.remove(state.currentTarget));
       hide();

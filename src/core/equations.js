@@ -22,7 +22,9 @@ export default (function EquationsLib () {
   const element = template(scaffold);
 
   const add = (latex, math) => {
-    const mml =  math.querySelector('script').textContent;
+    if (!math) return;
+
+    const mml = math.querySelector('script').textContent;
     const hash = base64(mml);
 
     if (!~state.hashes.indexOf(hash)) {
@@ -30,8 +32,10 @@ export default (function EquationsLib () {
       state.hashes.push(hash);
       state.equations[id] = {mml, latex};
       element.firstElementChild.insertBefore(
-        createElement(`button[data-add="${id}"]`, singleMathRender(latex)),
-        element.firstElementChild.firstChild
+        createElement(
+          `button[data-add="${id}"]`,
+          singleMathRender(latex)),
+          element.firstElementChild.firstChild
       );
       return true;
     }
@@ -46,7 +50,7 @@ export default (function EquationsLib () {
     if (altKey) {
       const index = state.hashes.indexOf(base64(state.equations[id].mml));
       state.hashes.splice(index, 1);
-      delete state.equations[id];      
+      delete state.equations[id];
       return target.parentNode.removeChild(target);
     }
 
