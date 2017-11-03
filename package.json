@@ -45,17 +45,17 @@
         ]
       },
       "electronPackagerConfig": {
-        "icon": "src/icons/png/64x64.png"
+        "icon": "./src/icons/png"
       },
       "electronWinstallerConfig": {
         "name": "Comet",
-        "icon": "src/icons/win/icon.ico"
+        "setupIcon": "./src/icons/win/icon.ico"
       },
       "electronInstallerDebian": {},
       "electronInstallerRedhat": {},
       "github_repository": {
         "owner": "ludekarts",
-        "name": "comet"
+        "name": "Comet"
       },
       "windowsStoreConfig": {
         "packageName": ""
