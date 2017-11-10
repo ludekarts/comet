@@ -198,3 +198,12 @@ export const Memo = (modifier, previous) => {
     return previous;
   }
 };
+
+// Collect all parentNode elments begin from given 'node' and end on 'div[content=true]'
+export const getPath = (node, path = [node]) => {
+  if (!node.parentNode.matches('div[content=true]')) {
+    path.push(node.parentNode);
+    return getPath(node.parentNode, path)
+  }
+  return path;
+};

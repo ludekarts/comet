@@ -47,7 +47,7 @@ const clone = (node, double) => {
 
 // Chenge <reference>s into <link> elements.
 const transformRefs = (node) => {
-  const link = createElement('link', node.innerHTML !== 'REFERENCE' ? node.innerHTML : '');
+  const link = createElement('link', node.innerHTML !== 'reference' ? node.innerHTML : '');
   copyAttrs(node, link);
   node.parentNode.replaceChild(link, node);
 };

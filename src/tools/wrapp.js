@@ -69,7 +69,7 @@ export default (function wrapp() {
 
 
   /**
-   * Remove wrapper el. from the given element or if element is not provided
+   * Remove wrapper el. from given element or if element is not provided
    * remove wrapper el. from the element containing caret.
    * @param  {HTMLElement|Undefined} element Element that need to be unwrpped.
    * @param  {String}                stopAt  Selector that can't be unwrapped.
@@ -88,13 +88,13 @@ export default (function wrapp() {
 
 
    /**
-    * Wrapp selection with wrappers separateb by *.
-    * EXAMPLE: wrapp.withText('[*]');
-    * @param  {String}     template String ccontaining wrapper elements separated by *.
+    * Wrapp selection with wrappers separateb by ^.
+    * EXAMPLE: wrapp.withText('[^]');
+    * @param  {String}     template String ccontaining wrapper elements separated by ^.
     * @return {Undefined}
     */
    const withText = (template) => {
-     const wraps = template.split('*');
+     const wraps = template.split('^');
      const selection = window.getSelection();
      const range = selection.getRangeAt(0);
      const selectedText = range.toString();

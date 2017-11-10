@@ -21,8 +21,8 @@ term {
 }
 
 foreign {
-  font-style: italic;
-  color: #d613d8;
+  font-weight: bold;
+  color: #9913d7;
 }
 
 // Block styles.
@@ -108,7 +108,7 @@ div[data-type=image] {
   display: block;
   text-align: center;
   position: relative;
-  background: #3f264e;
+  background: #282c34; //#3f264e;
   border-radius: 15px;
 
   &::before {

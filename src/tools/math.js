@@ -77,8 +77,8 @@ export const renderMath = (container) => new Promise((resolve) =>
 export const latexToMML = () => {
   const buffer = document.createElement('span');
   buffer.style.position = "absolute";
-  buffer.style.left = "-9999";
-  buffer.innerHTML = '$x$'
+  buffer.style.left = "-9999px";
+  buffer.innerHTML = '$x$';
   document.body.appendChild(buffer);
   return (latex) => new Promise((resolve) => {
     buffer.innerHTML = `$${latex}$`;

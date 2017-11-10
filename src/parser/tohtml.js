@@ -37,7 +37,7 @@ const clone = (node, double) => {
 // ---- TRANSFORMATIONS ----------------
 
 const transformLinks = (node) => {
-  const reference = createElement('reference', node.innerHTML.length > 0 ? node.innerHTML : 'REFERENCE');
+  const reference = createElement('reference', node.innerHTML.length > 0 ? node.innerHTML : 'reference');
   copyAttrs(node, reference);
   node.parentNode.replaceChild(reference, node);
   return reference;
