@@ -1,4 +1,37 @@
-/*MathPanel*/
+/* JAX-Wrapper */
+
+span.jax-math {
+  // color: #acf153;
+  color: #f5c304;
+  position: relative;
+  display: inline-block;
+  transition: all .2s ease;
+}
+
+span.jax-math:before {
+  content: ' ';
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10;
+  display: block;
+  position: absolute;
+}
+
+span.jax-math.active {
+  color: white;
+  padding: 4px 6px;
+  border-radius: 3px;
+  transition: all .2s ease;
+  border: 1px solid #f5c304;
+  background: rgba(245, 195, 4, 0.2)
+  // border: 1px solid #4dbd1e;
+  // background: rgba(142, 222, 49, 0.2);
+}
+
+
+/*MathPanel
 
 #mathPanel {
   top: 0;
@@ -48,34 +81,4 @@
 
 #mathPanel button:hover {
   background: rgba(255, 255, 255, 0.1);
-}
-
-
-/* JAX-Wrapper */
-
-span.jax-math {
-  color: #acf153;
-  position: relative;
-  display: inline-block;
-  transition: all .2s ease;
-}
-
-span.jax-math:before {
-  content: ' ';
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 10;
-  display: block;
-  position: absolute;
-}
-
-span.jax-math.active {
-  color: white;
-  padding: 4px 6px;
-  border-radius: 3px;
-  transition: all .2s ease;
-  border: 1px solid #4dbd1e;
-  background: rgba(142, 222, 49, 0.2);
-}
+} */

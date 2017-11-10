@@ -72,3 +72,16 @@ export const updateMath = (latex, element) => {
  */
 export const renderMath = (container) => new Promise((resolve) =>
   MathJax.Hub.Queue(["Typeset", MathJax.Hub, container, resolve]));
+
+
+export const latexToMML = () => {
+  const buffer = document.createElement('span');
+  buffer.style.position = "absolute";
+  buffer.style.left = "-9999";
+  buffer.innerHTML = '$x$'
+  document.body.appendChild(buffer);
+  return (latex) => new Promise((resolve) => {
+    buffer.innerHTML = `$${latex}$`;
+    MathJax.Hub.Queue(["Typeset", MathJax.Hub, buffer, resolve.bind(this, buffer)]);
+  });
+}

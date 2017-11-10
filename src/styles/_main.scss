@@ -1,0 +1,27 @@
+@import "../../node_modules/perfect-scrollbar/dist/css/perfect-scrollbar.css";
+@import "./math.scss";
+@import "./intro.scss";
+@import "./attrs.scss";
+@import "./cnxml.scss";
+@import "./wrapper.scss";
+@import "./workspace.scss";
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: sans-serif;
+}
+
+div[data-type] {
+  margin: 3px 0;
+  padding-left: 5px;
+  position: relative;
+  border-left: 2px solid #705c8a;
+  transition: background .3s ease;
+}
+
+div[data-type].active {
+  border-color: #edd606;
+  background: rgba(237, 214, 6, 0.1);
+}

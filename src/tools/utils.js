@@ -10,6 +10,10 @@ export const arrayToObject = (array, key) =>
 // Split string at index. -> splitAt(5)('HelloWord')
 export const splitAt = index => str => [str.slice(0, index), str.slice(index)];
 
+export const palceBetween = (source, value, position) =>
+  source.slice(0, position) + value + source.slice(position + value.length - 1, source.length);
+
+
 // Fortam XML input.
 export const formatXml = (xml) => {
   let pad = 0;
@@ -182,4 +186,15 @@ export const fuzzysearch = (chars, stack) => {
     return false;
   }
   return true;
+};
+
+
+// Modifier function with memory.
+export const Memo = (modifier, previous) => {
+  if (typeof modifier !== 'function') throw "Modifier need to be a function.";
+  return (current) => {
+    //NOTE: To memoize previous value you need to return it from the 'modifier'.
+    previous = modifier(current, previous);
+    return previous;
+  }
 };

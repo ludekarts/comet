@@ -3,7 +3,7 @@ import {createElement} from "../tools/travrs";
 
 
 // Do not pars those elements.
-const excluded = ['math', 'link', 'term', 'emphasis'];
+const excluded = ['math', 'link', 'term', 'emphasis', 'foreign'];
 
 // Create new 'x-tag' element from the Editable element.
 const cloneElement = (clone, node) => {
@@ -58,6 +58,7 @@ export default function toHtml(source) {
   const parser = new DOMParser();
   const xml = parser.parseFromString(processXml, "application/xml");
   const output = clone(xml, createElement('div'));
+  output.setAttribute('content', true);
 
   // Post transformations.
   Array.from(output.querySelectorAll('link')).forEach(transformLinks);
