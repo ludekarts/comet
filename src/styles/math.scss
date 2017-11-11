@@ -5,7 +5,6 @@ span.jax-math {
   color: #f5c304;
   position: relative;
   display: inline-block;
-  transition: all .2s ease;
 }
 
 span.jax-math:before {
@@ -19,16 +18,6 @@ span.jax-math:before {
   position: absolute;
 }
 
-span.jax-math.active {
-  color: white;
-  padding: 4px 6px;
-  border-radius: 3px;
-  transition: all .2s ease;
-  border: 1px solid #f5c304;
-  background: rgba(245, 195, 4, 0.2)
-  // border: 1px solid #4dbd1e;
-  // background: rgba(142, 222, 49, 0.2);
-}
 
 
 /*MathPanel

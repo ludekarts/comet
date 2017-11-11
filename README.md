@@ -1,3 +1,3 @@
 ☄ Comet
 =========================
-> Tool for editing MML equations in CNXML documents, and more.
+> Tool for editing content and MML equations in CNXML documents.

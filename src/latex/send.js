@@ -16,21 +16,13 @@ export default function send (latex, isBlock = false) {
         ? response.json()
         : {
             result: "<math><mo>⚔</mo></math>",
-            messages: [{
-              column: 0,
-              line: 0,
-              message: "Cannot render this equation. Try to use MathJax render."
-            }]
+            messages: [{message: "Cannot render this equation. Try to use MathJax render."}]
           }
     })
     .catch(error => {
       return {
         result: "<math><mo>⚞o⚟</mo></math>",
-        messages: [{
-          column: 0,
-          line: 0,
-          message: "Connection error"
-        }]
+        messages: [{message: "Connection error"}]
       }
     });
 };

@@ -1,43 +1,36 @@
-import {createElement, template} from "../tools/travrs";
+import {template} from "../tools/travrs";
 
 // ---- UI elements ----------------
 
-export const refs = {
-  render: createElement('div.render'),
-  messages: createElement('ul.messages'),
-  controls: createElement('div.controls'),
-  suggestions: createElement('ul.suggestions'),
-  usejax: createElement('input[type="checkbox"]'),
-  input: createElement('input.latex[type="text"]'),
-  useblock: createElement('input[type="checkbox"]'),
-};
-
 const scaffold = `
   div
-    @render
+    @render::div.render
     div.input
-      @input
-    @controls
+      @input::input.latex[type="text"]
+    @controls::div.controls
       span.tex-switch
         span > "MathJax"
         label.switch
-          @usejax
+          @usejax::input[type="checkbox"]
           span.slider
       span.tex-switch
         span > "Block"
         label.switch
-          @useblock
+          @useblock::input[type="checkbox"]
           span.slider
       button.flat.render[data-action="render"] > "Render"
       button.flat.apply[data-action="apply"] > "Apply"
-    @messages
-    @suggestions
+    @messages::ul.messages
+    @suggestions::ul.suggestions
 `;
 
-export const letexUI = template(refs, scaffold);
+const [element, references] = template(scaffold);
+
+export const refs = references;
+export const letexUI = element;
 
 export const newMessage = ({line, column, message}) => template(`
   li >
-    span.cl[title="line:column"] > "${line}:${column}"
+    span.cl[title="line:column"] > "${(line && column) ? (line +':'+ column) : ''} "
     span > "${message}"`
 );

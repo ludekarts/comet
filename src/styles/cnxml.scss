@@ -1,26 +1,30 @@
 
 // Inline styles.
-emphasis[effect=italics], i {
+span[data-inline]:focus {
+  outline: none !important;
+}
+
+span[data-inline=italics] {
   font-style: italic;
   color: #eeac00;
 }
 
-emphasis[effect=bold], b {
+span[data-inline=bold] {
   font-weight: bold;
   color: #4092da;
 }
 
-reference {
+span[data-inline=link] {
   text-decoration: underline;
   color: #0ebfe6;
 }
 
-term {
+span[data-inline=term] {
   font-weight: bold;
   color: #d613d8;
 }
 
-foreign {
+span[data-inline=foreign] {
   font-weight: bold;
   color: #9913d7;
 }

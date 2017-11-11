@@ -64,6 +64,15 @@ export const updateMath = (latex, element) => {
   return element;
 };
 
+export const updateMath2 = (element, mml) => new Promise((resolve) => {
+  element.innerHTML = mml;
+  MathJax.Hub.Queue(["Typeset", MathJax.Hub, element, () => {
+    element.dataset.mathId = element.querySelector('script').id;
+    resolve(mml);
+  }]);
+});
+
+
 
 /**
  * Run MathJax render.

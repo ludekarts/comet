@@ -1,19 +1,21 @@
 import send from "./send";
 import operators from "./operators";
 import scrollbar from "perfect-scrollbar";
-import {refs, newMessage, letexUI} from "./ui";
+import {letexUI, refs,newMessage} from "./ui";
 import {wrapMath, latexToMML} from "../tools/math";
 import {createBuffer, createFilter, createNavigator} from "./tools";
 
 export default function latexEditor(root) {
 
   // ---- Gobals ----------------
+  let applyCallback;
   const command = {};
 
   // Mount UI elements.
   root.appendChild(letexUI);
 
   // ---- Scrollbars ----------------
+
   scrollbar.initialize(refs.suggestions, {maxScrollbarLength: 50});
   scrollbar.initialize(refs.messages, {maxScrollbarLength: 10});
 
@@ -77,10 +79,12 @@ export default function latexEditor(root) {
       case 'render':
         !refs.usejax.checked
           ? send(refs.input.value, refs.useblock.checked).then(renderPreview)
-          : singleRender(refs.input.value).then(applyMathJax)
+          : singleRender(refs.input.value).then(parseMathJax).then(renderPreview)
         break;
       case 'apply':
-        return console.log('apply');
+        const math = MathJax.Hub.getAllJax(refs.render)[0];
+        applyCallback(math.root.toMathML())
+        break;
     }
   };
 
@@ -94,10 +98,12 @@ export default function latexEditor(root) {
     MathJax.Hub.Queue(["Typeset", MathJax.Hub, refs.render, () => wrapMath(refs.render)]);
   };
 
-  const applyMathJax = (node) => {
-    refs.render.innerHTML = '';
-    refs.messages.innerHTML = '';
-    refs.render.appendChild(node);
+  const parseMathJax = (node) => {
+    const math = MathJax.Hub.getAllJax(node)[0];
+    return {
+      result: math.root.toMathML(),
+      messages: math ? [] : [{message: "Cannot render this equation. The element is empty."}]
+    }
   }
 
   // ---- Listeners ----------------
@@ -115,5 +121,7 @@ export default function latexEditor(root) {
     return status;
   };
 
-  return {toggle}
+  const applyMath = (callback) => applyCallback = callback;
+
+  return {toggle, applyMath}
 };

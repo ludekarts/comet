@@ -86,90 +86,150 @@ main {
 }
 
 aside {
-  right: 0;
   top: 32px;
   width: 320px;
   bottom: 28px;
+  right: -340px;
   color: #5f6267;
   position: fixed;
   font-size: 14px;
   background: #242427;
+  transition: right .4s ease;
   border-left: 1px solid #1b191c;
 
-  & > div.header {
-    padding: 15px;
-    font-size: 14px;
+  &.show {
+    right: 0;
   }
 
-  & > div.footer {
-    bottom: 0px;
-    width: 100%;
-    text-align: right;
-    padding: 10px 15px;
-    position: absolute;
-    border-top: 1px solid #1b191c;
+  & > form {
 
-    & .save {
-      color: #ddd;
-      background: #229d35;
-
-      &:hover {
-        background: #157524;
+    & > div.header {
+      padding: 15px;
+      font-size: 14px;
+      & > span {
+        color: #1b191c;
+        font-size: 12px;
+        margin-left: 4px;
+        border-radius: 3px;
+        background: #f5c304;
+        vertical-align: top;
+        font-weight: normal;
+        padding: 2px 3px 3px 3px;
+        text-transform: uppercase;
       }
     }
-  }
 
-  & > .input {
-    display: flex;
-    color: #5f6267;
-    position: relative;
-    background: #1b1b1d;
-    margin: 25px 15px 40px 15px;
-
-    &::before {
-      left: 0;
-      top: -20px;
+    & hr {
+      border: none;
       display: block;
-      color: #5f6267;
-      font-size: 13px;
-      padding: 2px 5px;
-      position: absolute;
-      background: #1b1b1d;
-      content: attr(label);
+      margin: 30px 0 45px 0;
+      border-bottom: 1px solid #1b1b1d;
     }
 
-    & > input {
+    & > div.footer {
+      bottom: 0px;
       width: 100%;
-      border: none;
-      flex-grow: 1;
-      padding: 10px;
-      color: inherit;
-      background: none;
-      transition: box-shadow .3s ease;
+      text-align: right;
+      padding: 10px 15px;
+      position: absolute;
+      border-top: 1px solid #1b191c;
 
-      &:focus {
-        outline: none;
-        box-shadow: inset 0 -1px 0 #f5c304;
+      & .save {
+        color: #ddd;
+        background: #229d35;
+
+        &:hover {
+          background: #157524;
+        }
       }
     }
 
-    & > button.close {
-      width: 35px;
-      height: 36px;
-      border: none;
-      color: #1b1b1d;
-      line-height: 0;
-      cursor: pointer;
-      font-size: 32px;
-      background: #e13a34;
-      transition: background .3s ease;
+    & .input {
+      display: flex;
+      color: #5f6267;
+      position: relative;
+      background: #1b1b1d;
+      margin: 25px 15px 45px 15px;
 
-      &:hover {
-        background: #bd2a25;
+      &.no-label {
+        margin: 25px 15px 15px 15px;
+        &::before {
+          display: none;
+        }
       }
 
-      &:focus {
-        outline: none;
+      &::before {
+        left: 0;
+        top: -20px;
+        display: block;
+        color: #5f6267;
+        font-size: 13px;
+        padding: 2px 5px;
+        position: absolute;
+        background: #1b1b1d;
+        content: attr(label);
+      }
+
+      & > input {
+        width: 100%;
+        border: none;
+        flex-grow: 1;
+        padding: 10px;
+        color: inherit;
+        background: none;
+        transition: box-shadow .3s ease;
+
+        &:focus {
+          outline: none;
+          box-shadow: inset 0 -1px 0 #f5c304;
+        }
+      }
+
+      & > button.close {
+        width: 35px;
+        height: 36px;
+        border: none;
+        color: #1b1b1d;
+        line-height: 0;
+        cursor: pointer;
+        font-size: 32px;
+        background: #e13a34;
+        transition: background .3s ease;
+
+        &:hover {
+          background: #bd2a25;
+        }
+
+        &:focus {
+          outline: none;
+        }
+      }
+
+      & > button.add {
+        width: 35px;
+        height: 36px;
+        border: none;
+        color: #1b1b1d;
+        line-height: 0;
+        cursor: pointer;
+        font-size: 32px;
+        background: #f5c304;
+        transition: background .3s ease;
+
+        &:hover {
+          background: #f5c304;
+        }
+
+        &:focus {
+          outline: none;
+        }
+      }
+    }
+
+    & .content {
+      margin: 25px 15px 55px 15px;
+      &::before {
+        display: none;
       }
     }
   }
@@ -243,4 +303,13 @@ button.flat {
   &:focus {
     outline: none;
   }
+}
+
+
+.selected {
+  margin: -4px;
+  padding: 4px;
+  border-radius: 4px;
+  transition: background .4s ease;
+  background: rgba(33, 150, 243, 0.3);
 }

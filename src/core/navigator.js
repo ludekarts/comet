@@ -1,49 +1,53 @@
-import {updateMath} from "../tools/math";
-
-export default function Navigator (selector) {
-  let end, current, equations = [];
+export default (selector) => {
+  const api = {};
   let pointer = -1;
+  let end, currentElement, elements = [];
 
-  const clear = () => {
-    equations.forEach(eq => eq = null);
-    equations = [];
+  api.clear = () => {
+    elements.forEach(eq => eq = null);
+    elements = [];
+    return api;
   };
 
-  const next = () => {
-    if (current) current.classList.remove('active');
+  api.next = () => {
+    if (currentElement) currentElement.classList.remove('selected');
     pointer = pointer === end ? 0 : pointer + 1;
-    current = equations[pointer];
-    current.classList.add('active');
-    return current;
+    currentElement = elements[pointer];
+    currentElement.classList.add('selected');
+    return currentElement;
   };
 
-  const prev = () => {
-    if (current) current.classList.remove('active');
+  api.prev = () => {
+    if (currentElement) currentElement.classList.remove('selected');
     pointer = pointer < 0 ? end : pointer - 1;
-    current = equations[pointer];
-    current.classList.add('active');
-    return current;
+    currentElement = elements[pointer];
+    currentElement.classList.add('selected');
+    return currentElement;
   };
 
-  const update = (latex) =>
-    updateMath(latex, current);
-
-  const add = (latex) =>
-    console.log('add', latex);
-
-  const set = (element) => {
-    const index = equations.indexOf(element);
+  api.set = (element) => {
+    const index = elements.indexOf(element);
     if (~index) {
       pointer = index - 1;
-      next();
+      api.next();
     }
+    return api;
   };
 
-  const select = (selector) => {
-    clear();
-    equations = Array.from(document.querySelectorAll(selector));
-    end = equations.length - 1;
+  api.select = (selector) => {
+    api.clear();
+    elements = Array.from(document.querySelectorAll(selector));
+    end = elements.length - 1;
+    return api;
   };
 
-  return {select, add, set, next, prev, update};
+  api.deselect = () => {
+    currentElement.classList.remove('selected');
+    pointer = pointer - 1;
+    return api;
+  };
+
+  api.current = () => currentElement;
+
+  return api;
 };
