@@ -207,3 +207,10 @@ export const getPath = (node, path = [node]) => {
   }
   return path;
 };
+
+
+export const getNodesOut = (from) => {
+  if (from.childNodes.length === 0) return from.parentNode.removeChild(from);
+  from.parentNode.insertBefore(from.firstChild, from);
+  getNodesOut(from);
+};

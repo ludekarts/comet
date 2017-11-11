@@ -10,6 +10,7 @@ export default (selector) => {
   };
 
   api.next = () => {
+    if (elements.length === 0) return currentElement;
     if (currentElement) currentElement.classList.remove('selected');
     pointer = pointer === end ? 0 : pointer + 1;
     currentElement = elements[pointer];
@@ -18,6 +19,7 @@ export default (selector) => {
   };
 
   api.prev = () => {
+    if (elements.length === 0) return currentElement;
     if (currentElement) currentElement.classList.remove('selected');
     pointer = pointer < 0 ? end : pointer - 1;
     currentElement = elements[pointer];
@@ -42,6 +44,7 @@ export default (selector) => {
   };
 
   api.deselect = () => {
+    if (!currentElement) return api;
     currentElement.classList.remove('selected');
     pointer = pointer - 1;
     return api;

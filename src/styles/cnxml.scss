@@ -4,12 +4,12 @@ span[data-inline]:focus {
   outline: none !important;
 }
 
-span[data-inline=italics] {
+span[data-inline=emphasis][effect=italics] {
   font-style: italic;
   color: #eeac00;
 }
 
-span[data-inline=bold] {
+span[data-inline=emphasis][effect=bold] {
   font-weight: bold;
   color: #4092da;
 }
@@ -112,7 +112,7 @@ div[data-type=image] {
   display: block;
   text-align: center;
   position: relative;
-  background: #282c34; //#3f264e;
+  background: #282c34;
   border-radius: 15px;
 
   &::before {

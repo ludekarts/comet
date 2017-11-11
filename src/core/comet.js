@@ -3,10 +3,14 @@ import scrollbar from "perfect-scrollbar";
 
 // Tools.
 import latex from "../latex";
+import Search from "./search";
+import wrapp from "../tools/wrapp";
 import Navigator from "./navigator";
 import toHTML from "../parser/tohtml";
 import fileLoader from "../tools/fileLoader";
-import {Memo, getPath} from "../tools/utils";
+import {createElement} from "../tools/travrs";
+import {toXML, cleanMath} from "../parser/toxml";
+import {Memo, getPath, formatXml} from "../tools/utils";
 import {renderMath, wrapMath, updateMath2} from "../tools/math";
 
 // Editors.
@@ -15,16 +19,19 @@ import attribsEditor from "../editors/attributes";
 // UI references.
 const menu = document.querySelector('#menu');
 const editor = document.querySelector('main');
+const output = document.querySelector('output');
 const sidePanel = document.querySelector('aside');
 const breadcrumbs = document.querySelector('#breadcrumbs');
 const latexEditor = latex(document.querySelector('latex'));
 
 // Scrollbars.
 scrollbar.initialize(editor, {maxScrollbarLength: 90});
+scrollbar.initialize(output.firstElementChild, {maxScrollbarLength: 90});
 
 // Globals.
 let currentEditor;
 const navigator = Navigator();
+const search = Search(document.body, editor);
 const nonEditables = [
   'div[data-type=media]',
   'div[data-type=image]',
@@ -44,10 +51,13 @@ const editors = {
 };
 
 
+
 latexEditor.applyMath(mml => {
   const node = navigator.current();
   node.dataset.type === 'math' && updateMath2(node, mml);
 });
+
+search.whenFound(() => navigator.select('span.found'));
 
 const reRenderMath = (editor) =>
   renderMath(editor).then(() => wrapMath(editor));
@@ -123,15 +133,24 @@ const detectAction = ({target}) => {
     case 'latex':
       editor.style.bottom = latexEditor.toggle() ? '240px' : '29px';
       break;
+    case 'output':
+      if (output.classList.toggle('show'))
+      output.firstElementChild.value = formatXml(toXML(cleanMath(editor.firstElementChild.cloneNode(true))))
+      break;
   }
 };
 
 const keyboard = (event) => {
-  const {keyCode} = event;
+  const {keyCode, key} = event;
+
+  if (key === 'F3') {
+    search.toggle();
+  }
 
   // Escape.
   if (keyCode === 27) {
     sidePanel.classList.remove('show');
+    output.classList.remove('show');
     currentEditor = undefined;
     navigator.deselect();
   }

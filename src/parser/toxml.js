@@ -15,6 +15,7 @@ export const cleanMath = (source) => {
   return source;
 };
 
+const excludeAttribs = ['data-type', 'data-inline', 'contentEditable'];
 
 // Create new 'x-tag' element from the Editable element.
 const cloneElement = (clone, node) => {
@@ -23,12 +24,12 @@ const cloneElement = (clone, node) => {
   if (node.nodeType === 3)
     return clone.appendChild(document.createTextNode(node.textContent));
 
-  const newChild = node.nodeType !== 3
-    ? node.dataset && node.dataset.type ? createElement('x-' + node.dataset.type) : node.cloneNode(true)
-    : document.createTextNode(node.textContent);
+  const newChild = node.tagName !== 'math'
+    ? createElement('x-' + (node.dataset.type || node.dataset.inline))
+    : node.cloneNode(true);
 
-  // Copy attrinytes, excluding 'data-type'.
-  copyAttrs(node, newChild, ['data-type']);
+  // Copy attrinytes, excluding 'excludeAttribs'.
+  copyAttrs(node, newChild, excludeAttribs);
 
   // Appned x-tag.
   clone.appendChild(newChild);
@@ -45,27 +46,16 @@ const clone = (node, double) => {
 
 // ---- Transformations ----------------
 
-// Chenge <reference>s into <link> elements.
-const transformRefs = (node) => {
-  const link = createElement('link', node.innerHTML !== 'reference' ? node.innerHTML : '');
-  copyAttrs(node, link);
-  node.parentNode.replaceChild(link, node);
-};
-
 // Add namespace for math elements.
 const transformMath = (node) =>
   node.outerHTML = node.outerHTML.replace(/(<m|<\/m)/g, (match) => match === '<m' ? '<m:m' : '</m:m');
 
+const transformLinks = (node) =>
+  node.textContent === 'link' && (node.innerHTML = '');
+
 // Do not allow for line breake.
 const removeNewLines = (node) => node.parentNode.removeChild(node);
 
-// Transform <i> & <b> tags from Chrome.
-const transformEmphasis = (node) => {
-  const effect = node.matches('i') ? 'italics' : 'bold';
-  const newNode = createElement(`emphasis[effect="${effect}"]`, node.innerHTML);
-  copyAttrs(node, newNode);
-  node.outerHTML = newNode.outerHTML;
-};
 
 // Ensure all ids are unique.
 const transformUniqueIds = (collection = []) => (node) => {
@@ -93,13 +83,11 @@ export const toXML = (htmlNode) => {
   const firstElement = sourceClone.firstElementChild.cloneNode();
   const root = createElement(firstElement.dataset.type || 'div');
 
-  copyAttrs(firstElement, root, ['data-type']);
+  copyAttrs(firstElement, root, excludeAttribs);
 
   const xml = clone(sourceClone.firstElementChild, root).outerHTML
     // Remove 'x-' prefix at the end.
     .replace(/<x-|<\/x-/g, (x) => ~x.indexOf('<\/') ? '</' : '<')
-    // Close <img> tags.
-    .replace(/<img(.*?)>/g, (a, attrs) => `<image${attrs}/>`)
     // Replace custim namespaces from templates.
     .replace(/::.*?="/g, match => match.replace('::', ':'))
     // Remove all non-breaking sapces.
@@ -112,9 +100,8 @@ export const toXML = (htmlNode) => {
   const cnxml = parser.parseFromString(xml, "application/xml");
 
   // Transform back some of the xml tags to be compatible with CNXML standard.
-  Array.from(cnxml.querySelectorAll('reference')).forEach(transformRefs);
-  Array.from(cnxml.querySelectorAll('b, i')).forEach(transformEmphasis);
   Array.from(cnxml.querySelectorAll('math')).forEach(transformMath);
+  Array.from(cnxml.querySelectorAll('link')).forEach(transformLinks);
 
   // Return final CNXML.
   return serializer.serializeToString(cnxml)

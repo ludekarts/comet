@@ -1,4 +1,5 @@
 @import "../../node_modules/perfect-scrollbar/dist/css/perfect-scrollbar.css";
+@import "./search.scss";
 @import "./switch.scss";
 @import "./cnxml.scss";
 @import "./latex.scss";
@@ -59,7 +60,6 @@ header {
     }
   }
 }
-
 
 main {
   top:32px;
@@ -217,7 +217,7 @@ aside {
         transition: background .3s ease;
 
         &:hover {
-          background: #f5c304;
+          background: #dbaf07;
         }
 
         &:focus {
@@ -231,6 +231,77 @@ aside {
       &::before {
         display: none;
       }
+    }
+  }
+}
+
+output {
+  left: 0;
+  top: 32px;
+  border:none;
+  width: 100%;
+  bottom: 28px;
+  position: fixed;
+  background: #1b1b1d;
+
+
+  /* hide */
+  opacity: 0;
+  z-index: 0;
+  overflow: hidden;
+  visibility:hidden;
+  transform: scale(0.95) translateZ(0);
+  transition: visibility 0s linear 0.5s, opacity .3s ease, transform .3s ease;
+
+  & > textarea {
+    top:0;
+    bottom: 0;
+    width: 100%;
+    color: #ddd;
+    border:none;
+    resize: none;
+    padding: 20px 5%;
+    overflow: hidden;
+    background: none;
+    position: absolute;
+    font-family:monospace;
+    border-bottom: 21px solid #242328;
+
+    &:focus {
+      outline: none;
+    }
+  }
+
+  &.show {
+    /* Show*/
+    opacity: 1;
+    z-index: 3000;
+    visibility:visible;
+    transform: scale(1) translateZ(0);
+    transition: opacity .3s ease, transform .3s ease, visibility 0s;
+  }
+
+  & .save {
+    bottom: 0;
+    right: 1px;
+    color: #ddd;
+    background: #229d35;
+    position: absolute;
+
+    &:hover {
+      background: #157524;
+    }
+  }
+
+  & .copy {
+    bottom: 0;
+    right: 54px;
+    color: #1b1b1d;
+    background: #f5c304;
+    position: absolute;
+
+    &:hover {
+      background: #bb9607;
     }
   }
 }
@@ -312,4 +383,13 @@ button.flat {
   border-radius: 4px;
   transition: background .4s ease;
   background: rgba(33, 150, 243, 0.3);
+}
+
+
+.found {
+  background: #3c5170;
+
+  &.selected {
+    border: 2px solid #12e5ab;
+  }
 }
