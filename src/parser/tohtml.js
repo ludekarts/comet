@@ -11,7 +11,7 @@ const cloneElement = (clone, node) => {
   if (node.nodeType === 3) return clone.appendChild(document.createTextNode(node.textContent));
 
   // Clone math, block and inline elements.
-  const newChild = node.tagName === 'math'
+  const newChild = (node.tagName === 'math' || node.nodeType === 8)
     ? node.cloneNode(true)
     : node.tagName && !~inlineElements.indexOf(node.tagName.toLowerCase())
       ? createElement(`div[data-type="${node.tagName}"]`)

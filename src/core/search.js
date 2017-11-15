@@ -3,13 +3,11 @@ import {createElement, template} from "../tools/travrs";
 
 const scaffold = `
   div.searchbox
-    h3 > "Search words"
-    div.input
-      @input::input[type="text"]
-      @counter::span.counter > "0"
-    div.footer
-      span > "Use <b>TAB</b> to navigate through results"
-      button.flat.save[data-action="search"] > "Search"
+    div.wrapper
+      span.label > "Find"
+      div.input
+        @input::input[type="text"]
+        @counter::span.counter > "0"
 `;
 
 export default (root, source) => {
@@ -54,26 +52,43 @@ const findPhrase = (phrase) => {
     if (action === 'search' && refs.input.value.length > 0) findPhrase(refs.input.value);
   };
 
-  const detectEnter = ({keyCode}) =>
-    keyCode === 13 && refs.input.value.length > 0 && findPhrase(refs.input.value);
+   const clearSearch = () => {
+     clearSelection();
+     refs.counter.textContent = 0;
+     refs.input.value = '';
+   }
 
-  // Listeners.
-  refs.input.addEventListener('keyup', detectEnter);
-  element.addEventListener('click', detectAction);
-  root.appendChild(element);
-
-  const toggle = () => {
-    if (element.classList.toggle('show')) {
-      refs.input.focus();
+  const detectEnter = ({keyCode}) => {
+    if (keyCode === 13 && refs.input.value.length > 0) {
+      clearSelection();
+      findPhrase(refs.input.value);
     }
-    else {
-      Array.from(source.querySelectorAll('span.found')).forEach(getNodesOut);
-      refs.counter.textContent = 0;
-      refs.input.value = '';
+    else if (keyCode === 27 && !source.querySelector('span.found.selected')) {
+      element.classList.toggle('show');
+      clearSearch();
     }
   }
 
-  const whenFound = (callback) => onFoundCallback = callback;
+  const clearSelection = () =>
+    Array.from(source.querySelectorAll('span.found'))
+      .forEach(node => {
+        const parent = node.parentNode;
+        getNodesOut(node);
+        parent.normalize();
+      });
 
-  return {toggle, whenFound}
+  // Listeners.
+  refs.input.addEventListener('keydown', detectEnter);
+  element.addEventListener('click', detectAction);
+  root.appendChild(element);
+
+  const toggle = () =>
+    element.classList.toggle('show')
+      ? refs.input.focus()
+      : clearSearch();
+
+  const onFound = (callback) => onFoundCallback = callback;
+  const clear = () => clearSearch();
+
+  return {toggle, onFound, clear}
 };

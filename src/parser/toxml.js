@@ -15,7 +15,7 @@ export const cleanMath = (source) => {
   return source;
 };
 
-const excludeAttribs = ['data-type', 'data-inline', 'contentEditable'];
+const excludeAttribs = ['data-type', 'data-inline', 'data-select', 'contenteditable'];
 
 // Create new 'x-tag' element from the Editable element.
 const cloneElement = (clone, node) => {
@@ -24,9 +24,9 @@ const cloneElement = (clone, node) => {
   if (node.nodeType === 3)
     return clone.appendChild(document.createTextNode(node.textContent));
 
-  const newChild = node.tagName !== 'math'
-    ? createElement('x-' + (node.dataset.type || node.dataset.inline))
-    : node.cloneNode(true);
+  const newChild = (node.tagName === 'math' || node.nodeType === 8)
+    ? node.cloneNode(true)
+    : createElement('x-' + (node.dataset.type || node.dataset.inline));
 
   // Copy attrinytes, excluding 'excludeAttribs'.
   copyAttrs(node, newChild, excludeAttribs);

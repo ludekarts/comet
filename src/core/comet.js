@@ -1,19 +1,24 @@
 // Vendors.
 import scrollbar from "perfect-scrollbar";
 
-// Tools.
-import latex from "../latex";
+// Core.
 import Search from "./search";
-import wrapp from "../tools/wrapp";
 import Navigator from "./navigator";
+
+// Parser.
 import toHTML from "../parser/tohtml";
-import fileLoader from "../tools/fileLoader";
-import {createElement} from "../tools/travrs";
 import {toXML, cleanMath} from "../parser/toxml";
+
+// Tools.
+import wrapp from "../tools/wrapp";
+import {fileLoader} from "../tools/io";
+import {createElement} from "../tools/travrs";
 import {Memo, getPath, formatXml} from "../tools/utils";
-import {renderMath, wrapMath, updateMath2} from "../tools/math";
+import {renderMath, wrapMath, updateMath} from "../tools/math";
 
 // Editors.
+import latex from "../editors/latex";
+import mediaEditor from "../editors/media";
 import attribsEditor from "../editors/attributes";
 
 // UI references.
@@ -32,32 +37,43 @@ scrollbar.initialize(output.firstElementChild, {maxScrollbarLength: 90});
 let currentEditor;
 const navigator = Navigator();
 const search = Search(document.body, editor);
-const nonEditables = [
-  'div[data-type=media]',
-  'div[data-type=image]',
-  'span[data-type=math]',
-  'span[data-inline=link]',
-  'span[data-inline=term]',
-  'span[data-inline=foreign]',
-  'span[data-inline=emphasis]'
-];
+
+// Selectors for the editors.
 const editors = {
-  link: attribsEditor,
-  term: attribsEditor,
-  // media: mediaEditor,
-  // image: mediaEditor,
-  foreign: attribsEditor,
-  emphasis: attribsEditor,
+  'div[data-type=media]': mediaEditor,
+  'span[data-inline=link]': attribsEditor,
+  'span[data-inline=term]': attribsEditor,
+  'span[data-inline=foreign]': attribsEditor,
+  'span[data-inline=emphasis]': attribsEditor,
 };
 
+const editorsList = Object.keys(editors);
 
+// Ignore click events for those nodes.
+const ignoreNodes = [
+  'body',
+  'main',
+  'div[data-type=figure]',
+  'div[data-type=section]'
+];
 
+// Configure some of the Componets.
 latexEditor.applyMath(mml => {
   const node = navigator.current();
-  node.dataset.type === 'math' && updateMath2(node, mml);
+  node.dataset.type === 'math' && updateMath(node, mml);
 });
 
-search.whenFound(() => navigator.select('span.found'));
+search.onFound(() => navigator.select('span.found'));
+
+// Helpers.
+const getName = (node) => node.dataset.type || node.dataset.inline;
+const hasEditor = (node) => !!editorsList.find(selector => node.matches(selector));
+const getSelector = (node) => node.dataset.type
+  ? `div[data-type=${node.dataset.type}]`
+  : `span[data-inline=${node.dataset.inline}]`;
+
+
+// ---- Glue Logic ----------------
 
 const reRenderMath = (editor) =>
   renderMath(editor).then(() => wrapMath(editor));
@@ -74,13 +90,17 @@ fileLoader("C:\\Users\\Ludek\\Desktop\\sample.cnxml").then(parse).catch(console.
 
 const displayPath = (root) => {
   const path = getPath(root);
-  breadcrumbs.innerHTML = path.reverse().reduce(
-    (result, node, index) =>
-      result +=`
-      <span class="breadcrumb" data-num="${index}">
-        ${node.dataset ? (node.dataset.type || node.dataset.inline) : node.tagName.toLowerCase()}
-      </span> » `, ''
-  ).slice(0, -3);
+
+  breadcrumbs.innerHTML = path
+    .reverse()
+    .filter(node => node.dataset.type || node.dataset.inline)
+    .reduce(
+      (result, node, index) =>
+        result +=`
+        <span class="breadcrumb" data-num="${index}">
+          ${node.dataset.type || node.dataset.inline}
+        </span> » `, ''
+    ).slice(0, -3);
 };
 
 const activeNode = Memo((current, active) => {
@@ -96,32 +116,39 @@ const activeNode = Memo((current, active) => {
   return active;
 });
 
-const getName = (node) => node.dataset.type || node.dataset.inline;
-const isExcluded = (node) => !!nonEditables.find(selector => node.matches(selector));
-const getSelector = (node) => node.dataset.type
-  ? `div[data-type="${node.dataset.type}"]`
-  : `span[data-inline="${node.dataset.inline}"]`;
+
+const editMeta = ({target}) => {
+  if (target.matches && target.matches('div[data-type=metadata]')) {
+    target.classList.toggle('expand');
+  }
+}
 
 const editNode = ({target, altKey}) => {
-  if (target === document.body) return;
-
-  // Trace target DOM path.
-  if (!isExcluded(target)) {
-    displayPath(activeNode(target.dataset.empty ? target : window.getSelection().anchorNode.parentNode));
-  }
-  else if (target.dataset.type === 'math') {
+  if (ignoreNodes.find(selector => target.matches(selector))) return;
+  // console.log(target); // Debug.
+  if (target.dataset.type === 'math') {
     navigator.select('span.jax-math').set(target);
+    displayPath(target);
+    search.clear();
+    return;
+  }
+
+  if (hasEditor(target)) {
+    const selector = getSelector(target);
+    currentEditor = editors[selector];
+    // Fail gracefully.
+    if (!currentEditor) return console.warn(`Canont find editor for "${selector}" selector.`);
+    // Run Editor.
+    sidePanel.classList.add('show');
+    sidePanel.firstElementChild && sidePanel.removeChild(sidePanel.firstElementChild);
+    sidePanel.appendChild(currentEditor.element);
+    currentEditor.edit(target, getName(target));
+    navigator.select(selector).set(target);
+    search.clear();
     displayPath(target);
   }
   else {
-    const name = getName(target);
-    sidePanel.classList.add('show');
-    sidePanel.firstElementChild && sidePanel.removeChild(sidePanel.firstElementChild);
-    currentEditor = editors[name];
-    sidePanel.appendChild(currentEditor.element);
-    currentEditor.edit(target, name);
-    navigator.select(getSelector(target)).set(target);
-    displayPath(target);
+    displayPath(activeNode(target.dataset.empty ? target : window.getSelection().anchorNode.parentNode));
   }
 };
 
@@ -134,8 +161,9 @@ const detectAction = ({target}) => {
       editor.style.bottom = latexEditor.toggle() ? '240px' : '29px';
       break;
     case 'output':
-      if (output.classList.toggle('show'))
-      output.firstElementChild.value = formatXml(toXML(cleanMath(editor.firstElementChild.cloneNode(true))))
+      if (output.classList.toggle('show')) {
+        output.firstElementChild.value = formatXml(toXML(cleanMath(editor.firstElementChild.cloneNode(true))));
+      }
       break;
   }
 };
@@ -143,9 +171,8 @@ const detectAction = ({target}) => {
 const keyboard = (event) => {
   const {keyCode, key} = event;
 
-  if (key === 'F3') {
-    search.toggle();
-  }
+  if (key === 'F3') search.toggle();
+  if (key === 'F2') latexEditor.toggle();
 
   // Escape.
   if (keyCode === 27) {
@@ -160,7 +187,7 @@ const keyboard = (event) => {
     // Make selection.
     event.preventDefault();
     navigator.next().scrollIntoView();
-    editor.scrollTop = editor.scrollTop - 60;
+    editor.scrollTop = editor.scrollTop - 80;
 
     // Use editor
     if (currentEditor) {
@@ -173,5 +200,6 @@ const keyboard = (event) => {
 };
 
 editor.addEventListener('click', editNode);
+editor.addEventListener('dblclick', editMeta);
 menu.addEventListener('click', detectAction);
 document.addEventListener('keydown', keyboard);

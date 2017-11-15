@@ -1,4 +1,4 @@
-import {template} from "../tools/travrs";
+import {template} from "../../tools/travrs";
 
 // ---- UI elements ----------------
 

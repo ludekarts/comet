@@ -2,7 +2,7 @@ import fs from 'fs';
 import {remote} from "electron";
 
 // Load XML file.
-export default (path) => new Promise((resolve, reject) => {
+export const fileLoader = (path) => new Promise((resolve, reject) => {
   
   const load = (url) => {
     if (!url) return reject(new Error('No url'));

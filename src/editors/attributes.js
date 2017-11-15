@@ -2,7 +2,7 @@ import {splitAt, inDeltaTime} from "../tools/utils";
 import {createElement, template} from "../tools/travrs";
 
 const scaffold = `
-  form[onsubmit="\"return false;\""]
+  div
     @header::div.header > "Inline edit"
     div.input.no-label
       @content::input[type="text" value=""]
@@ -26,6 +26,8 @@ export default ((root) => {
 
   let currentElement;
   const [element, refs] = template(scaffold);
+  const excludedAttrs = ['contenteditable', 'data-inline', 'data-select'];
+
 
   const edit = (node, name) => {
     currentElement = node;
@@ -37,7 +39,7 @@ export default ((root) => {
     refs.content.value = node.textContent;
     // Add attributes.
     Array.from(node.attributes).forEach(attr => {
-      if (attr.name !== 'contenteditable' && attr.name !== 'data-inline' && attr.value )
+      if (!excludedAttrs.includes(attr.name) && attr.value)
         refs.inputs.appendChild(attribute(attr.name, attr.value));
     });
   };
@@ -68,7 +70,7 @@ export default ((root) => {
       }, []);
       // Remove.
       Array.from(currentElement.attributes).forEach(attr => {
-        if (attr.name !== 'contenteditable' && attr.name !== 'data-inline' && !newAttibutes.includes(attr.name))
+        if (!excludedAttrs.includes(attr.name) && !newAttibutes.includes(attr.name))
           currentElement.removeAttribute(attr.name);
       });
     }

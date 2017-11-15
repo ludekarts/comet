@@ -2,8 +2,8 @@ import send from "./send";
 import operators from "./operators";
 import scrollbar from "perfect-scrollbar";
 import {letexUI, refs,newMessage} from "./ui";
-import {wrapMath, latexToMML} from "../tools/math";
-import {createBuffer, createFilter, createNavigator} from "./tools";
+import {wrapMath, latexToMML} from "../../tools/math";
+import {createBuffer, createFilter, createNavigator} from "./utils";
 
 export default function latexEditor(root) {
 

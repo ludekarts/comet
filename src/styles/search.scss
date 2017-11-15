@@ -1,58 +1,67 @@
 div.searchbox {
   left: 50%;
-  bottom: -180px;
-  width: 350px;
-  z-index: 3000;
+  top: -50px;
+  z-index: 5;
+  width: 100%;
   display: block;
   position: fixed;
   background: #242427;
-  padding-bottom: 15px;
-  transform: translateX(-50%);
-  transition: bottom .4s ease-in;
+  border-bottom: 1px solid #1b191c;
+  transform: translateX(-50%) translateZ(0);
   box-shadow: 0px 1px 30px 0 rgba(0, 0, 0, 0.2);
+  transition: top .4s ease-in, transform .4s ease-in;
 
   &.show {
-    bottom: 50px;
+    top: 32px;
   }
 
-  & > h3 {
-    color: #91959E;
-    font-size: 16px;
-    font-weight: 400;
-    margin: 13px 15px 5px 15px;
-  }
-
-  & > div.input {
-    margin: 15px;
+  div.wrapper {
+    width: 350px;
     display: flex;
-    position: relative;
-    background: #1b1b1d;
+    margin: 3px auto;
 
-    & > input {
-      border: none;
+    & > span.label {
+      color: #91959E;
+      font-size: 16px;
+      font-weight: 400;
+      margin-top: 12px;
+      margin-right: 10px;
+      display: inline-block;
+    }
+
+    & > div.input {
+      margin: 1px;
       flex-grow: 1;
-      padding: 12px;
-      color: #5f6267;
-      background: none;
+      display: flex;
+      position: relative;
+      background: #1b1b1d;
 
-      &:focus {
-        outline: none;
+      & > input {
+        border: none;
+        flex-grow: 1;
+        padding: 12px;
+        color: #5f6267;
+        background: none;
+
+        &:focus {
+          outline: none;
+        }
+      }
+
+      & .counter {
+        padding: 10px;
+        color: #a8eb51;
       }
     }
 
-    & .counter {
-      padding: 10px;
-      color: #a8eb51;
-    }
-  }
+    & .save {
+      color: #ddd;
+      float: right;
+      background: #229d35;
 
-  & .save {
-    color: #ddd;
-    float: right;
-    background: #229d35;
-
-    &:hover {
-      background: #157524;
+      &:hover {
+        background: #157524;
+      }
     }
   }
 

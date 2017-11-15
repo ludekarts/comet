@@ -9,7 +9,9 @@ const fetchConfig = (body) => ({
 });
 
 export default function send (latex, isBlock = false) {
-  headers.append("x-display", isBlock ? "block" : "inline");
+  headers.has("x-display")
+    ? headers.set("x-display", isBlock ? "block" : "inline")
+    : headers.append("x-display", isBlock ? "block" : "inline");
   return fetch('http://tex2mml.naukosfera.com', fetchConfig(latex))
     .then(response => {
       return ~response.headers.get("content-type").indexOf('application/json')

@@ -1,4 +1,4 @@
-import {fuzzysearch} from "../tools/utils";
+import {fuzzysearch} from "../../tools/utils";
 
 // ---- Creators ----------------
 
