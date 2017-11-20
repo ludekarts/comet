@@ -1,0 +1,50 @@
+
+// ---- Application Header Styles ----------------
+
+header {
+  width: 100%;
+  height: 32px;
+  z-index: 1000;
+  display: block;
+  padding: 0 10px;
+  position: relative;
+  background: #242328;
+  border-bottom: 1px solid #1b191c;
+
+  & > button {
+    padding: 0;
+    width: 12px;
+    height: 12px;
+    border: none;
+    cursor: pointer;
+    border-radius: 50%;
+    display: inline-block;
+    margin: 10px 3px 11px 3px;
+    transition: background .3s ease;
+
+    &:focus {
+      outline: none;
+    }
+
+    &.close {
+      background: #c44b42;
+      &:hover {
+        background: #d05a51;
+      }
+    }
+
+    &.minimize {
+      background: #eaa513;
+      &:hover {
+        background: #f0c306;
+      }
+    }
+
+    &.maximize {
+      background: #249d34;
+      &:hover {
+        background: #29b83c;
+      }
+    }
+  }
+}

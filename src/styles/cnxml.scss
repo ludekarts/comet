@@ -1,5 +1,6 @@
 
-// Inline styles.
+// ---- Inline styles ----------------
+
 span[data-inline]:focus {
   outline: none !important;
 }
@@ -29,7 +30,7 @@ span[data-inline=foreign] {
   color: #9913d7;
 }
 
-// Block styles.
+// ---- Block styles ----------------
 
 div[data-type] {
   margin: 5px 0;
@@ -90,7 +91,6 @@ div[data-type=metadata] {
     }
   }
 }
-
 
 div[data-type=title] {
   color: #cacaca;

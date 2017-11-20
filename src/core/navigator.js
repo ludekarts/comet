@@ -46,7 +46,7 @@ export default (selector) => {
 
   api.deselect = () => {
     if (!currentElement) return api;
-    currentElement.classList.remove('selected');
+    currentElement.dataset.select = false;
     pointer = pointer - 1;
     return api;
   };

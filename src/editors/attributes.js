@@ -1,18 +1,20 @@
+import scrollbar from "perfect-scrollbar";
 import {splitAt, inDeltaTime} from "../tools/utils";
 import {createElement, template} from "../tools/travrs";
 
 const scaffold = `
-  div
+  div.editor
     @header::div.header > "Inline edit"
-    div.input.no-label
-      @content::input[type="text" value=""]
-    div.input.no-label
-      @add::input[type="text" value=""]
-      button.add[data-action="add"] > "+"
-    hr
-    @inputs::div
+    @content::div.content
+      div.input.no-label
+        @text::input[type="text" value=""]
+      div.input.no-label
+        @add::input[type="text" value=""]
+        button.add[data-action="add"] > "+"
+      hr
+      @inputs::div
     div.footer
-      button.flat.save[data-action="save"] > "Save"
+      button.save[data-action="save"] > "Save"
 `;
 
 const attribute = (name, value) => template(`
@@ -28,6 +30,7 @@ export default ((root) => {
   const [element, refs] = template(scaffold);
   const excludedAttrs = ['contenteditable', 'data-inline', 'data-select'];
 
+  scrollbar.initialize(refs.content, {maxScrollbarLength: 90});
 
   const edit = (node, name) => {
     currentElement = node;
@@ -36,7 +39,7 @@ export default ((root) => {
     // Header.
     refs.header.innerHTML = `Inline edit <span>${name}</span>`;
     // Content.
-    refs.content.value = node.textContent;
+    refs.text.value = node.textContent;
     // Add attributes.
     Array.from(node.attributes).forEach(attr => {
       if (!excludedAttrs.includes(attr.name) && attr.value)
@@ -60,7 +63,7 @@ export default ((root) => {
       refs.add.value = '';
     }
     else if (action === 'save') {
-      currentElement.textContent = refs.content.value;
+      currentElement.textContent = refs.text.value;
       // Add & replace.
       const newAttibutes = Array.from(refs.inputs.querySelectorAll('input')).reduce((final, input) => {
         const name = input.parentNode.getAttribute('label');

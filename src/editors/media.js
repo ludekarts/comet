@@ -1,21 +1,24 @@
-import {splitAt, inDeltaTime} from "../tools/utils";
+import scrollbar from "perfect-scrollbar";
 import {createElement, template} from "../tools/travrs";
 
 const scaffold = `
-  div.mediaEditor
+  div.editor
     @header::div.header > "Media edit"
-    div.input[label="src"]
-      @src::input[type="text" value=""]
-    div.input[label="alt text"]
-      @alt::textarea
+    @content::div.content
+      div.input[label="src"]
+        @src::input[type="text" value=""]
+      div.input[label="alt text"]
+        @alt::textarea
     div.footer
-      button.flat.save[data-action="save"] > "Save"
+      button.save[data-action="save"] > "Save"
 `;
 
 export default ((root) => {
 
   let currentElement;
   const [element, refs] = template(scaffold);
+
+  scrollbar.initialize(refs.content, {maxScrollbarLength: 90});
 
   const edit = (node) => {
     currentElement = node.matches('div[data-type=figure]') ? node.firstElementChild : node;

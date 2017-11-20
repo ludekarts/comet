@@ -11,7 +11,7 @@
         tex2jax: {inlineMath: [["$", "$"]]}
       };
     </script>
-    <link rel="stylesheet" href="styles/main.scss"/>
+    <link rel="stylesheet" href="styles/comet.scss"/>
     <script src="http://localhost/projects/api/mj/mathjax/unpacked/MathJax.js?config=TeX-MML-AM_CHTML" charset="utf-8"></script>
     <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" charset="utf-8"></script> -->
   </head>
@@ -26,14 +26,13 @@
     <latex></latex>
     <output>
       <textarea></textarea>
-      <button class="flat copy" data-action="copy">Copy</button>      
-      <button class="flat save" data-action="save">Save</button>
+      <span class="message hide">Copied to clipboard</span>
+      <button class="copy" data-action="copy">Copy</button>
+      <button class="save" data-action="save">Save</button>
     </output>
     <footer>
-      <div id="breadcrumbs" class="breadcrumbs">
-        <!-- <span class="breadcrumb">documet</span> » -->
-      </div>
-      <div id="menu" class="bottom-menu">
+      <div id="breadcrumbs" class="breadcrumbs"></div>
+      <div id="menu" class="menu">
         <button data-action="latex">LaTeX</button>
         <button data-action="eqas">Equations</button>
         <button data-action="output">Output</button>

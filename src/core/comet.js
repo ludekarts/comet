@@ -12,9 +12,10 @@ import {toXML, cleanMath} from "../parser/toxml";
 // Tools.
 import wrapp from "../tools/wrapp";
 import {fileLoader} from "../tools/io";
+import minimate from "../tools/minimate";
 import {createElement} from "../tools/travrs";
-import {Memo, getPath, formatXml} from "../tools/utils";
 import {renderMath, wrapMath, updateMath} from "../tools/math";
+import {Memo, getPath, formatXml, classie} from "../tools/utils";
 
 // Editors.
 import latex from "../editors/latex";
@@ -176,10 +177,10 @@ const keyboard = (event) => {
 
   // Escape.
   if (keyCode === 27) {
-    sidePanel.classList.remove('show');
+    !sidePanel.classList.contains('show') && navigator.deselect();
+    sidePanel.classList.remove('show') ;
     output.classList.remove('show');
     currentEditor = undefined;
-    navigator.deselect();
   }
 
   // Tab.
@@ -199,7 +200,18 @@ const keyboard = (event) => {
   }
 };
 
+const outputHandlers = ({target}) => {
+  const action = target.dataset.action;
+  if (!action) return;
+  if (action === 'copy') {
+    output.firstElementChild.select();
+    document.execCommand('copy');
+    minimate(output.querySelector('span.message')).add('show').remove('show', 2);
+  }
+};
+
 editor.addEventListener('click', editNode);
 editor.addEventListener('dblclick', editMeta);
+output.addEventListener('click', outputHandlers);
 menu.addEventListener('click', detectAction);
 document.addEventListener('keydown', keyboard);

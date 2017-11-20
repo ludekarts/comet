@@ -1,0 +1,50 @@
+
+// ---- Default Styles ----------------
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Lato', sans-serif;
+}
+
+body {
+  background: #1b191c;
+}
+
+button {
+  border: none;
+  padding: 10px;
+  line-height: 0;
+  cursor: pointer;
+  display: inline-block;
+  text-transform: uppercase;
+  transition: background .3s ease;
+
+  &:focus {
+    outline: none;
+  }
+}
+
+// ---- Selection ----------------
+
+[data-select=true] {
+  margin: -4px;
+  padding: 4px;
+  border-radius: 4px;
+  transition: background .4s ease;
+  background: rgba(33, 150, 243, 0.3);
+}
+
+[data-select=false] {
+  transition: background .4s ease;
+  background: rgba(33, 150, 243, 0);
+}
+
+[data-select=true].found {
+  border: 2px solid #12e5ab;
+}
+
+.found {
+  background: #3c5170;
+}

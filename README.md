@@ -14,8 +14,8 @@
 - Keyboard shortcuts
 - Save file
 - Frameless window
-- Scroll content in attr panel
++ Scroll content in attr panel
 + Escapce sequences
 - Code cleanup.
-- CSS cleanup - refactor to compoenent model
++ CSS cleanup - refactor to compoenent model
 - Help panel
