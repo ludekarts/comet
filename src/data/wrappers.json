@@ -1,0 +1,32 @@
+[
+  {
+    "tag":"term",
+    "name":"term",
+    "attrs": "xmlns:cmlnle=\"http:\/\/katalysteducation.org\/cmlnle\/1.0\" cmlnle:reference=\"form\""
+  },
+  {
+    "tag":"link",
+    "name":"link",
+    "attrs": "target-id=\"ID\" xmlns:cmlnle=\"http:\/\/katalysteducation.org\/cmlnle\/1.0\" cmlnle:template=\"Rysunku %n\""
+  },
+  {
+    "tag":"link",
+    "name":"link-external",
+    "attrs": "document=\"docID\" target-id=\"ID\""
+  },
+  {
+    "tag":"link",
+    "name":"link-chapter",
+    "attrs": "document=\"docID\" class=\"target-chapter\""
+  },
+  {
+    "tag":"emphasis",
+    "name":"bold",
+    "attrs": "effect=\"bold\""
+  },
+  {
+    "tag":"emphasis",
+    "name":"italic",
+    "attrs": "effect=\"italics\""
+  }
+]

@@ -14,7 +14,7 @@ export default (function wrapp() {
 
 
   /**
-   *  Wrap 'elements' with HTMLElement of given 'type' with provided 'attrs'.
+   *  Wrap list of elements with new HTMLElement of given 'type' with provided 'attrs'.
    *  EXAMPLE: wrapp.elements(node, 'del', { "data-skip-merge" : true });
    * @param  {Array|HTMLElement} els   List or element to wrap.
    * @param  {String}            type  Type of wrapper element.
@@ -96,12 +96,10 @@ export default (function wrapp() {
    const withText = (template) => {
      const wraps = template.split('^');
      const selection = window.getSelection();
-     const range = selection.getRangeAt(0);
-     const selectedText = range.toString();
-     document.execCommand("insertHTML", false, wraps[0] + selectedText + wraps[1]);
+     const selectedText = selection.toString();
+     document.execCommand("insertText", false, wraps[0] + selectedText + wraps[1]);
      if (selectedText.length === 0) selection.modify('move', 'backward', 'character');
    };
-
 
 
   return { elements, selection, withText, remove };

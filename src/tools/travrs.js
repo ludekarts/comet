@@ -1,5 +1,5 @@
 
-// travrs.js v 0.2.0
+// travrs.js v 0.2.1
 //
 // An utility to help create DOM structure/elements from 'templateString'.
 // by Wojciech Ludwin 2017, ludekarts@gmail.com
@@ -18,7 +18,7 @@
 
 export const createElement = (phrase, content) => {
  // Filter attributes.
- let attrs = phrase.match(/[\w-]+=".+?"/g);
+ let attrs = phrase.match(/[\w-:]+=".+?"/g);
  if (attrs) attrs = attrs.map(match => match.replace(/"/g,'').split('='));
 
  // Filter id, type & classes.

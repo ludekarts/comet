@@ -115,13 +115,17 @@ export default function latexEditor(root) {
 
   // ---- API methods ----------------
 
+  const applyMath = (callback) => applyCallback = callback;
+
   const toggle = () => {
     const status = letexUI.classList.toggle('show');
-    status ? refs.input.focus() : (refs.suggestions.innerHTML = '')
+    status ? refs.input.focus() : (refs.suggestions.innerHTML = '');
     return status;
   };
 
-  const applyMath = (callback) => applyCallback = callback;
+  const render = (latex) => !refs.usejax.checked
+    ? send(latex, refs.useblock.checked).then((json) => json.result)
+    : singleRender(latex).then(parseMathJax).then((json) => json.result);
 
-  return {toggle, applyMath}
+  return {toggle, applyMath, render}
 };

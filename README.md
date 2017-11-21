@@ -7,15 +7,18 @@
 + Expand Metadata
 + Fix bug with breadcrumbs display on math elements
 + Clean output CNXML
-- Templates
-- Bractets wrapper
-- Copy output to clipboard
-- Equaions panel
-- Keyboard shortcuts
-- Save file
-- Frameless window
++ Copy output to clipboard
 + Scroll content in attr panel
 + Escapce sequences
-- Code cleanup.
 + CSS cleanup - refactor to compoenent model
++ Templates wrappers
++ Brackets wrappers
+- Equaions panel
+- Keyboard shortcuts
+- Math-rendering preloader
+- Ctrl + z
+- Save file
+- Open file
+- Frameless window
+- Code cleanup
 - Help panel

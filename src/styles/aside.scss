@@ -19,7 +19,7 @@ aside {
   }
 
   & > div.editor {
-      
+
     & > div.header {
       padding: 15px;
       font-size: 14px;
@@ -42,6 +42,24 @@ aside {
       top: 47px;
       bottom: 40px;
       position: absolute;
+
+      & > button {
+        width: 100%;
+        color: #868a92;
+        text-align: left;
+        padding: 25px 15px;
+        background: transparent;
+        transition: background .3s ease;
+        border-bottom: 1px solid #1b191c;
+
+        &:first-child {
+          border-top: 1px solid #1b191c;
+        }
+
+        &:hover {
+          background: #282c34;
+        }
+      }
     }
 
     & > div.footer {

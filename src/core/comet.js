@@ -11,7 +11,7 @@ import {toXML, cleanMath} from "../parser/toxml";
 
 // Tools.
 import wrapp from "../tools/wrapp";
-import {fileLoader} from "../tools/io";
+import {xmlLoader} from "../tools/io";
 import minimate from "../tools/minimate";
 import {createElement} from "../tools/travrs";
 import {renderMath, wrapMath, updateMath} from "../tools/math";
@@ -21,6 +21,7 @@ import {Memo, getPath, formatXml, classie} from "../tools/utils";
 import latex from "../editors/latex";
 import mediaEditor from "../editors/media";
 import attribsEditor from "../editors/attributes";
+import templatesEditor from "../editors/templates";
 
 // UI references.
 const menu = document.querySelector('#menu');
@@ -48,6 +49,7 @@ const editors = {
   'span[data-inline=emphasis]': attribsEditor,
 };
 
+// Editor list for quick reference.
 const editorsList = Object.keys(editors);
 
 // Ignore click events for those nodes.
@@ -58,15 +60,31 @@ const ignoreNodes = [
   'div[data-type=section]'
 ];
 
-// Configure some of the Componets.
+// ---- Componets configuration ----------------
+
+// Replace selected MathJax equation.
 latexEditor.applyMath(mml => {
   const node = navigator.current();
   node.dataset.type === 'math' && updateMath(node, mml);
 });
 
+// Convert selected text into math.
+templatesEditor.onMathWrapp((selection) => {
+  latexEditor.render(selection).then((mml) => {
+    const math = wrapp.selection(createElement('span'), {
+      'class': 'jax-math',
+      'data-type': 'math',
+      'contenteditable': 'false'
+    });
+    updateMath(math, mml);
+  });
+});
+
+// Select founded text string.
 search.onFound(() => navigator.select('span.found'));
 
-// Helpers.
+// ---- Helpers ----------------
+
 const getName = (node) => node.dataset.type || node.dataset.inline;
 const hasEditor = (node) => !!editorsList.find(selector => node.matches(selector));
 const getSelector = (node) => node.dataset.type
@@ -86,7 +104,7 @@ const parse = (xml) => {
 };
 
 // Load Files.
-fileLoader("C:\\Users\\Ludek\\Desktop\\sample.cnxml").then(parse).catch(console.error);
+xmlLoader("C:\\Users\\Ludek\\Desktop\\sample.cnxml").then(parse).catch(console.error);
 
 
 const displayPath = (root) => {
@@ -102,6 +120,12 @@ const displayPath = (root) => {
           ${node.dataset.type || node.dataset.inline}
         </span> » `, ''
     ).slice(0, -3);
+};
+
+const swapSidePanel = (content) => {
+  sidePanel.classList.add('show');
+  sidePanel.firstElementChild && sidePanel.removeChild(sidePanel.firstElementChild);
+  sidePanel.appendChild(content);
 };
 
 const activeNode = Memo((current, active) => {
@@ -140,9 +164,7 @@ const editNode = ({target, altKey}) => {
     // Fail gracefully.
     if (!currentEditor) return console.warn(`Canont find editor for "${selector}" selector.`);
     // Run Editor.
-    sidePanel.classList.add('show');
-    sidePanel.firstElementChild && sidePanel.removeChild(sidePanel.firstElementChild);
-    sidePanel.appendChild(currentEditor.element);
+    swapSidePanel(currentEditor.element);
     currentEditor.edit(target, getName(target));
     navigator.select(selector).set(target);
     search.clear();
@@ -153,27 +175,39 @@ const editNode = ({target, altKey}) => {
   }
 };
 
+
+// ---- Toggle Panels ----------------
+
+const toggleLatex = () =>
+  (editor.style.bottom = latexEditor.toggle() ? '240px' : '29px');
+
+const toggleOutput = () =>
+  output.classList.toggle('show') &&
+    (output.firstElementChild.value = formatXml(toXML(cleanMath(editor.firstElementChild.cloneNode(true)))));
+
+const toggleWrappers = () =>
+  sidePanel.classList.toggle('show') && swapSidePanel(templatesEditor.element);
+
 const detectAction = ({target}) => {
   const action = target.dataset.action;
   if (!action) return;
 
   switch (action) {
     case 'latex':
-      editor.style.bottom = latexEditor.toggle() ? '240px' : '29px';
-      break;
+      return toggleLatex();
     case 'output':
-      if (output.classList.toggle('show')) {
-        output.firstElementChild.value = formatXml(toXML(cleanMath(editor.firstElementChild.cloneNode(true))));
-      }
-      break;
+      return toggleOutput();
+    case 'wraps':
+      return toggleWrappers();
   }
 };
 
-const keyboard = (event) => {
-  const {keyCode, key} = event;
 
+const keyboard = (event) => {
+  const {keyCode, key, altKey} = event;
+
+  if (key === 'F2') toggleLatex();
   if (key === 'F3') search.toggle();
-  if (key === 'F2') latexEditor.toggle();
 
   // Escape.
   if (keyCode === 27) {
@@ -198,6 +232,19 @@ const keyboard = (event) => {
       name !== 'math' && currentEditor.edit(node, name);
     }
   }
+
+  // Alt + w.
+  if (altKey && keyCode === 87) toggleWrappers();
+
+  // Alt + x.
+  if (altKey && keyCode === 88) toggleOutput();
+
+  // Brackets & quotes wrapper.
+  if (key === '[') (event.preventDefault(), wrapp.withText('[^]'));
+  else if (key === '(') (event.preventDefault(), wrapp.withText('(^)'));
+  else if (key === '{') (event.preventDefault(), wrapp.withText('{^}'));
+  else if (key === '"') (event.preventDefault(), wrapp.withText('"^"'));
+  else if (key === '\'') (event.preventDefault(), wrapp.withText('\'^\''));
 };
 
 const outputHandlers = ({target}) => {
