@@ -13,6 +13,9 @@
 + CSS cleanup - refactor to compoenent model
 + Templates wrappers
 + Brackets wrappers
++ LatexEditor shortcuts
++ Load additional operators and attibutes from config
++ Added unwrap-inline
 - Equaions panel
 - Keyboard shortcuts
 - Math-rendering preloader

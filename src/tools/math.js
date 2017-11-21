@@ -39,12 +39,12 @@ export const updateMath = (element, mml) => new Promise((resolve) => {
 
 
 /**
- * Run MathJax render.
+ * Render MML markup in gien container.
  * @param  {HTMLElement} container DOM node thet contains math to render.
- * @return {Promise}     Promise resolves when math is ready.
+ * @return {Promise}               Promise resolves when math is ready.
  */
 export const renderMath = (container) => new Promise((resolve) =>
-  MathJax.Hub.Queue(["Typeset", MathJax.Hub, container, resolve]));
+  MathJax.Hub.Queue(["Typeset", MathJax.Hub, container, () => resolve(container)]));
 
 
 /**

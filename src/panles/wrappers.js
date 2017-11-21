@@ -1,8 +1,5 @@
-import path from "path";
-import {remote} from "electron";
+import provider from "../data/provider";
 import scrollbar from "perfect-scrollbar";
-import wrappers from "../data/wrappers.json";
-import {jsonLoader, exist} from "../tools/io";
 import {createElement, template} from "../tools/travrs";
 
 const scaffold = `
@@ -12,28 +9,23 @@ const scaffold = `
       button[data-action="math"] > "Math"
 `;
 
-const wrappersUrl = remote.app.getPath('home') + path.sep + 'comet.config.json';
 
 export default (() => {
 
-  let onMathWrappCallback;
+  let onMathWrappCallback, wrappers;
 
   const [element, refs] = template(scaffold);
   scrollbar.initialize(refs.content, {maxScrollbarLength: 90});
 
   const newButton = ({tag, name}) =>
-    createElement(`button[data-action="${tag}"]`, name);
+    createElement(`button[data-action="${name}"]`, name);
 
-  const createContent = (source) =>
+  const createContent = (source) =>{
+    wrappers = source;
     source.forEach(wrapper => {
       refs.content.appendChild(newButton(wrapper))
     });
-
-  const addMoreTemplates = (response) => {
-    if (response === false) return;
-    createContent(response.wrappers);
-    response.wrappers.forEach(wrapper => wrappers.push(wrapper));
-  };
+  }
 
   const wrapSelection = ({tag, attrs}, selection) => {
     const range = selection.getRangeAt(0);
@@ -53,12 +45,7 @@ export default (() => {
   };
 
   // Add wrappers.
-  createContent(wrappers);
-
-  // Load wrappers from config.
-  exist(wrappersUrl)
-    .then(flag => flag && jsonLoader(wrappersUrl))
-    .then(addMoreTemplates);
+  provider('wrappers').then(createContent).catch(console.error);
 
   // Listeners.
   element.addEventListener('click', detectAction);

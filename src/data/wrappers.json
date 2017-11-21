@@ -7,7 +7,7 @@
   {
     "tag":"link",
     "name":"link",
-    "attrs": "target-id=\"ID\" xmlns:cmlnle=\"http:\/\/katalysteducation.org\/cmlnle\/1.0\" cmlnle:template=\"Rysunku %n\""
+    "attrs": "target-id=\"ID\" xmlns:cmlnle=\"http:\/\/katalysteducation.org\/cmlnle\/1.0\" cmlnle:case=\"CASE\""
   },
   {
     "tag":"link",
@@ -28,5 +28,10 @@
     "tag":"emphasis",
     "name":"italic",
     "attrs": "effect=\"italics\""
+  },
+  {
+    "tag":"foreign",
+    "name":"foreign",
+    "attrs": ""
   }
 ]

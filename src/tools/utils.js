@@ -74,6 +74,9 @@ export const base64 = (str) =>
     String.fromCharCode('0x' + p1)
   ));
 
+// Create hashCode from string.
+export const hashCode = (source) =>
+  source.split("").reduce((a, b) => { a = (( a << 5) - a) + b.charCodeAt(0); return a&a }, 0);
 
 // Debounce callback fn.
 export const debounce = (callback, wait, immediate) => {

@@ -5,7 +5,7 @@ const fetchConfig = (body) => ({
   mode: 'cors',
   method: 'post',
   cache: 'default',
-  body: '\\usepackage{math} \\begin{document} \\begin{math} ' + body + ' \\end{math} \\end{document} '
+  body: '\\usepackage{math}\\begin{document}\\begin{math}' + body + '\\end{math}\\end{document}'
 });
 
 export default function send (latex, isBlock = false) {

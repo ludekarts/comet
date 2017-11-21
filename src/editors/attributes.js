@@ -1,3 +1,4 @@
+import wrapp from "../tools/wrapp";
 import scrollbar from "perfect-scrollbar";
 import {splitAt, inDeltaTime} from "../tools/utils";
 import {createElement, template} from "../tools/travrs";
@@ -14,6 +15,7 @@ const scaffold = `
       hr
       @inputs::div
     div.footer
+      button.warn[data-action="unwrap"] > "Unwrap"
       button.save[data-action="save"] > "Save"
 `;
 
@@ -26,7 +28,7 @@ const attribute = (name, value) => template(`
 
 export default ((root) => {
 
-  let currentElement;
+  let currentElement, onCloseCallback;
   const [element, refs] = template(scaffold);
   const excludedAttrs = ['contenteditable', 'data-inline', 'data-select'];
 
@@ -80,10 +82,16 @@ export default ((root) => {
     else if (action === 'delete') {
       refs.inputs.removeChild(target.parentNode);
     }
+    else if (action === 'unwrap') {
+      wrapp.remove(currentElement);      
+      onCloseCallback && onCloseCallback();
+    }
   };
+
+  const onClose = (callback) => onCloseCallback = callback;
 
   // Listeners.
   element.addEventListener('click', detectAction);
 
-  return {element, edit}
+  return {element, edit, onClose}
 })();

@@ -18,8 +18,8 @@ const scaffold = `
         label.switch
           @useblock::input[type="checkbox"]
           span.slider
-      button.flat.render[data-action="render"] > "Render"
-      button.flat.apply[data-action="apply"] > "Apply"
+      button.render[title="Ctrl + Enter" data-action="render"] > "Render"
+      button.apply[title="Shift + Enter"data-action="apply"] > "Apply"
     @messages::ul.messages
     @suggestions::ul.suggestions
 `;

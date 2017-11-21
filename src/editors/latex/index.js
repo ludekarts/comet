@@ -1,14 +1,14 @@
 import send from "./send";
-import operators from "./operators";
 import scrollbar from "perfect-scrollbar";
+import provider from "../../data/provider";
 import {letexUI, refs,newMessage} from "./ui";
-import {wrapMath, latexToMML} from "../../tools/math";
+import {wrapMath, latexToMML, renderMath} from "../../tools/math";
 import {createBuffer, createFilter, createNavigator} from "./utils";
 
 export default function latexEditor(root) {
 
   // ---- Gobals ----------------
-  let applyCallback;
+  let onMathRenderCallback;
   const command = {};
 
   // Mount UI elements.
@@ -24,7 +24,11 @@ export default function latexEditor(root) {
   const buffer = createBuffer();
   const singleRender = latexToMML();
   const navigate = createNavigator(refs.suggestions);
-  const filter = createFilter(operators, refs.suggestions);
+
+  let filter;
+  provider('operators')
+    .then(operators => filter = createFilter(operators, refs.suggestions))
+    .catch(console.error);
 
   // ---- Handlers ----------------
 
@@ -38,7 +42,7 @@ export default function latexEditor(root) {
   };
 
   const detectArrows = (event) => {
-    const {keyCode} = event;
+    const {keyCode, shiftKey, ctrlKey} = event;
 
     if (keyCode === 40) {
       event.preventDefault();
@@ -50,6 +54,10 @@ export default function latexEditor(root) {
     }
     else if (keyCode === 13) {
       event.preventDefault();
+
+      if (ctrlKey) return renderMathML();
+      if (shiftKey) return applyMathML();
+
       const letexUI = navigate();
       letexUI && detectOperator({target: letexUI});
     }
@@ -71,20 +79,27 @@ export default function latexEditor(root) {
     command.clear();
   };
 
+  // ---- Actions ----------------
+
+  const renderMathML = () =>
+    !refs.usejax.checked
+      ? send(refs.input.value, refs.useblock.checked).then(renderPreview)
+      : singleRender(refs.input.value).then(parseMathJax).then(renderPreview);
+
+  const applyMathML = () => {
+    const math = MathJax.Hub.getAllJax(refs.render)[0];
+    onMathRenderCallback && onMathRenderCallback(math.root.toMathML(), refs.input.value);
+  };
+
   const detectTexAction = ({target}) => {
     const action = target.dataset.action;
     if (!action) return;
 
     switch (action) {
       case 'render':
-        !refs.usejax.checked
-          ? send(refs.input.value, refs.useblock.checked).then(renderPreview)
-          : singleRender(refs.input.value).then(parseMathJax).then(renderPreview)
-        break;
+        return renderMathML();
       case 'apply':
-        const math = MathJax.Hub.getAllJax(refs.render)[0];
-        applyCallback(math.root.toMathML())
-        break;
+        return applyMathML();
     }
   };
 
@@ -95,7 +110,7 @@ export default function latexEditor(root) {
     refs.render.innerHTML = json.result;
     refs.messages.innerHTML = '';
     json.messages.reduce((result, message) => result.appendChild(newMessage(message)), refs.messages);
-    MathJax.Hub.Queue(["Typeset", MathJax.Hub, refs.render, () => wrapMath(refs.render)]);
+    renderMath(refs.render).then(wrapMath);
   };
 
   const parseMathJax = (node) => {
@@ -115,7 +130,7 @@ export default function latexEditor(root) {
 
   // ---- API methods ----------------
 
-  const applyMath = (callback) => applyCallback = callback;
+  const onMathRender = (callback) => onMathRenderCallback = callback;
 
   const toggle = () => {
     const status = letexUI.classList.toggle('show');
@@ -127,5 +142,5 @@ export default function latexEditor(root) {
     ? send(latex, refs.useblock.checked).then((json) => json.result)
     : singleRender(latex).then(parseMathJax).then((json) => json.result);
 
-  return {toggle, applyMath, render}
+  return {toggle, onMathRender, render}
 };

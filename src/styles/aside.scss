@@ -48,16 +48,32 @@ aside {
         color: #868a92;
         text-align: left;
         padding: 25px 15px;
+        position: relative;
         background: transparent;
         transition: background .3s ease;
         border-bottom: 1px solid #1b191c;
 
-        &:first-child {
+        &:first-of-type {
           border-top: 1px solid #1b191c;
         }
 
         &:hover {
           background: #282c34;
+        }
+
+        &:before {
+          top:0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          z-index: 10;
+          content: ' ';
+          position: absolute;
+          background: transparent;
+        }
+
+        &.math {
+          text-align: center !important;
         }
       }
     }
@@ -76,6 +92,16 @@ aside {
 
         &:hover {
           background: #157524;
+        }
+      }
+
+      & .warn {
+        color: #ddd;
+        margin: 0 10px;
+        background: #1b1b1d;
+
+        &:hover {
+          background: #294dba;
         }
       }
     }
@@ -176,12 +202,5 @@ aside {
         }
       }
     }
-
-    // & .content {
-    //   margin: 25px 15px 55px 15px;
-    //   &::before {
-    //     display: none;
-    //   }
-    // }
   }
 }

@@ -21,7 +21,10 @@ import {Memo, getPath, formatXml, classie} from "../tools/utils";
 import latex from "../editors/latex";
 import mediaEditor from "../editors/media";
 import attribsEditor from "../editors/attributes";
-import templatesEditor from "../editors/templates";
+
+// Panles.
+import wrappersPanel from "../panles/wrappers";
+import equationsPanel from "../panles/equations";
 
 // UI references.
 const menu = document.querySelector('#menu');
@@ -63,13 +66,15 @@ const ignoreNodes = [
 // ---- Componets configuration ----------------
 
 // Replace selected MathJax equation.
-latexEditor.applyMath(mml => {
+latexEditor.onMathRender((mml, latex) => {
   const node = navigator.current();
-  node.dataset.type === 'math' && updateMath(node, mml);
+  if (node.dataset.type !== 'math') return;
+  updateMath(node, mml);
+  equationsPanel.add(mml, latex);
 });
 
 // Convert selected text into math.
-templatesEditor.onMathWrapp((selection) => {
+wrappersPanel.onMathWrapp((selection) => {
   latexEditor.render(selection).then((mml) => {
     const math = wrapp.selection(createElement('span'), {
       'class': 'jax-math',
@@ -83,6 +88,9 @@ templatesEditor.onMathWrapp((selection) => {
 // Select founded text string.
 search.onFound(() => navigator.select('span.found'));
 
+// Hide Attributes editor on it's demand.
+attribsEditor.onClose(() => sidePanel.classList.remove('show'));
+
 // ---- Helpers ----------------
 
 const getName = (node) => node.dataset.type || node.dataset.inline;
@@ -95,17 +103,13 @@ const getSelector = (node) => node.dataset.type
 // ---- Glue Logic ----------------
 
 const reRenderMath = (editor) =>
-  renderMath(editor).then(() => wrapMath(editor));
+  renderMath(editor).then(wrapMath);
 
 const parse = (xml) => {
   editor.innerHTML = '';
   editor.appendChild(toHTML(xml));
   reRenderMath(editor);
 };
-
-// Load Files.
-xmlLoader("C:\\Users\\Ludek\\Desktop\\sample.cnxml").then(parse).catch(console.error);
-
 
 const displayPath = (root) => {
   const path = getPath(root);
@@ -186,7 +190,10 @@ const toggleOutput = () =>
     (output.firstElementChild.value = formatXml(toXML(cleanMath(editor.firstElementChild.cloneNode(true)))));
 
 const toggleWrappers = () =>
-  sidePanel.classList.toggle('show') && swapSidePanel(templatesEditor.element);
+  sidePanel.classList.toggle('show') && swapSidePanel(wrappersPanel.element);
+
+const toggleEquations = () =>
+  sidePanel.classList.toggle('show') && swapSidePanel(equationsPanel.element);
 
 const detectAction = ({target}) => {
   const action = target.dataset.action;
@@ -199,12 +206,15 @@ const detectAction = ({target}) => {
       return toggleOutput();
     case 'wraps':
       return toggleWrappers();
+    case 'equs':
+      return toggleEquations();
   }
 };
 
+// ---- Keyboard shortcuts ----------------
 
 const keyboard = (event) => {
-  const {keyCode, key, altKey} = event;
+  const {keyCode, key, altKey, ctrlKey} = event;
 
   if (key === 'F2') toggleLatex();
   if (key === 'F3') search.toggle();
@@ -235,10 +245,14 @@ const keyboard = (event) => {
 
   // Alt + w.
   if (altKey && keyCode === 87) toggleWrappers();
-
   // Alt + x.
   if (altKey && keyCode === 88) toggleOutput();
 
+  // Ctrl + o.
+  if (ctrlKey && keyCode === 79) xmlLoader().then(parse).catch(console.error);
+    // Ctrl + Space.
+  if (ctrlKey && keyCode === 32) (event.preventDefault(), toggleEquations());
+  
   // Brackets & quotes wrapper.
   if (key === '[') (event.preventDefault(), wrapp.withText('[^]'));
   else if (key === '(') (event.preventDefault(), wrapp.withText('(^)'));
@@ -259,6 +273,6 @@ const outputHandlers = ({target}) => {
 
 editor.addEventListener('click', editNode);
 editor.addEventListener('dblclick', editMeta);
-output.addEventListener('click', outputHandlers);
 menu.addEventListener('click', detectAction);
+output.addEventListener('click', outputHandlers);
 document.addEventListener('keydown', keyboard);
