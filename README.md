@@ -16,12 +16,12 @@
 + LatexEditor shortcuts
 + Load additional operators and attibutes from config
 + Added unwrap-inline
-- Equaions panel
++ Equaions panel
++ Open file
++ Save file
 - Keyboard shortcuts
 - Math-rendering preloader
 - Ctrl + z
-- Save file
-- Open file
 - Frameless window
 - Code cleanup
 - Help panel

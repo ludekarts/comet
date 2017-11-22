@@ -109,12 +109,14 @@ div[data-type=glossary] {
 div[data-type=figure] {
   padding: 5px;
   margin: 5px 0;
+  user-select: none;
   text-align: center;
 }
 
 div[data-type=media] {
-  position: relative;
   padding: 4px;
+  user-select: none;
+  position: relative;
   &::before {
     top: 0;
     left: 0;
@@ -131,6 +133,7 @@ div[data-type=image] {
   height: 210px;
   margin: 0 auto;
   display: block;
+  user-select: none;
   text-align: center;
   position: relative;
   background: #282c34;

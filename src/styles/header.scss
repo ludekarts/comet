@@ -7,9 +7,18 @@ header {
   z-index: 1000;
   display: block;
   padding: 0 10px;
+  text-align: right;
   position: relative;
   background: #242328;
   border-bottom: 1px solid #1b191c;
+
+  & > img {
+    float: left;
+    width: 20px;
+    height: 20px;
+    display: block;
+    margin: 6px 0px 0px -5px;
+  }
 
   & > button {
     padding: 0;

@@ -11,28 +11,32 @@ import {toXML, cleanMath} from "../parser/toxml";
 
 // Tools.
 import wrapp from "../tools/wrapp";
-import {xmlLoader} from "../tools/io";
 import minimate from "../tools/minimate";
 import {createElement} from "../tools/travrs";
+import {xmlLoader, saveFile} from "../tools/io";
 import {renderMath, wrapMath, updateMath} from "../tools/math";
 import {Memo, getPath, formatXml, classie} from "../tools/utils";
 
 // Editors.
-import latex from "../editors/latex";
+import latexInit from "../editors/latex";
 import mediaEditor from "../editors/media";
 import attribsEditor from "../editors/attributes";
 
 // Panles.
+import equations from "../panles/equations";
 import wrappersPanel from "../panles/wrappers";
-import equationsPanel from "../panles/equations";
 
 // UI references.
 const menu = document.querySelector('#menu');
+const latex = document.querySelector('latex');
 const editor = document.querySelector('main');
 const output = document.querySelector('output');
 const sidePanel = document.querySelector('aside');
 const breadcrumbs = document.querySelector('#breadcrumbs');
-const latexEditor = latex(document.querySelector('latex'));
+
+// Setup.
+const latexEditor = latexInit(latex);
+const equationsPanel = equations(editor);
 
 // Scrollbars.
 scrollbar.initialize(editor, {maxScrollbarLength: 90});
@@ -59,37 +63,10 @@ const editorsList = Object.keys(editors);
 const ignoreNodes = [
   'body',
   'main',
+  'logo',
   'div[data-type=figure]',
   'div[data-type=section]'
 ];
-
-// ---- Componets configuration ----------------
-
-// Replace selected MathJax equation.
-latexEditor.onMathRender((mml, latex) => {
-  const node = navigator.current();
-  if (node.dataset.type !== 'math') return;
-  updateMath(node, mml);
-  equationsPanel.add(mml, latex);
-});
-
-// Convert selected text into math.
-wrappersPanel.onMathWrapp((selection) => {
-  latexEditor.render(selection).then((mml) => {
-    const math = wrapp.selection(createElement('span'), {
-      'class': 'jax-math',
-      'data-type': 'math',
-      'contenteditable': 'false'
-    });
-    updateMath(math, mml);
-  });
-});
-
-// Select founded text string.
-search.onFound(() => navigator.select('span.found'));
-
-// Hide Attributes editor on it's demand.
-attribsEditor.onClose(() => sidePanel.classList.remove('show'));
 
 // ---- Helpers ----------------
 
@@ -104,6 +81,15 @@ const getSelector = (node) => node.dataset.type
 
 const reRenderMath = (editor) =>
   renderMath(editor).then(wrapMath);
+
+const insertMath = (mml) => {
+  const math = wrapp.selection(createElement('span'), {
+    'class': 'jax-math',
+    'data-type': 'math',
+    'contenteditable': 'false'
+  });
+  updateMath(math, mml);
+};
 
 const parse = (xml) => {
   editor.innerHTML = '';
@@ -153,8 +139,15 @@ const editMeta = ({target}) => {
 }
 
 const editNode = ({target, altKey}) => {
-  if (ignoreNodes.find(selector => target.matches(selector))) return;
   // console.log(target); // Debug.
+
+  // Handel open file button.
+  if (target.matches('span.open')) return toggleFileLoader();
+
+  // Skip ignoreNodes.
+  if (ignoreNodes.find(selector => target.matches(selector))) return;
+
+  // Handel Maths.
   if (target.dataset.type === 'math') {
     navigator.select('span.jax-math').set(target);
     displayPath(target);
@@ -162,6 +155,7 @@ const editNode = ({target, altKey}) => {
     return;
   }
 
+  // Handel inline elements.
   if (hasEditor(target)) {
     const selector = getSelector(target);
     currentEditor = editors[selector];
@@ -174,11 +168,38 @@ const editNode = ({target, altKey}) => {
     search.clear();
     displayPath(target);
   }
+
+  // Handel edit node selection.
   else {
     displayPath(activeNode(target.dataset.empty ? target : window.getSelection().anchorNode.parentNode));
   }
 };
 
+
+// ---- Components configuration ----------------
+
+// Select founded text string.
+search.onFound(() => navigator.select('span.found'));
+
+// Replace selected MathJax equation.
+latexEditor.onMathApply((mml, latex) => {
+  const node = navigator.current();
+  if (node.dataset.type !== 'math') return;
+  updateMath(node, mml);
+  equationsPanel.add(mml, latex);
+});
+
+// Convert selected text into math.
+wrappersPanel.onMathWrapp((selection) => latexEditor.render(selection).then(insertMath));
+
+// Hide Attributes editor on it's demand.
+attribsEditor.onClose(() => sidePanel.classList.remove('show'));
+
+// Place LaTeX formula from equationsPanel into latexEditor.
+equationsPanel.onPlaceLatex((latex) => latexEditor.addFormula(latex));
+
+// Insert MathJax node into CNXML content.
+equationsPanel.onPlaceMML(insertMath);
 
 // ---- Toggle Panels ----------------
 
@@ -194,6 +215,9 @@ const toggleWrappers = () =>
 
 const toggleEquations = () =>
   sidePanel.classList.toggle('show') && swapSidePanel(equationsPanel.element);
+
+const toggleFileLoader = () =>
+  xmlLoader().then(parse).catch(console.error);
 
 const detectAction = ({target}) => {
   const action = target.dataset.action;
@@ -249,10 +273,10 @@ const keyboard = (event) => {
   if (altKey && keyCode === 88) toggleOutput();
 
   // Ctrl + o.
-  if (ctrlKey && keyCode === 79) xmlLoader().then(parse).catch(console.error);
+  if (ctrlKey && keyCode === 79) toggleFileLoader();
     // Ctrl + Space.
   if (ctrlKey && keyCode === 32) (event.preventDefault(), toggleEquations());
-  
+
   // Brackets & quotes wrapper.
   if (key === '[') (event.preventDefault(), wrapp.withText('[^]'));
   else if (key === '(') (event.preventDefault(), wrapp.withText('(^)'));
@@ -268,6 +292,9 @@ const outputHandlers = ({target}) => {
     output.firstElementChild.select();
     document.execCommand('copy');
     minimate(output.querySelector('span.message')).add('show').remove('show', 2);
+  }
+  else if (action === 'save') {
+    saveFile(output.firstElementChild.value);
   }
 };
 

@@ -8,8 +8,8 @@ import {createBuffer, createFilter, createNavigator} from "./utils";
 export default function latexEditor(root) {
 
   // ---- Gobals ----------------
-  let onMathRenderCallback;
   const command = {};
+  let onMathApplyCallback, selectionEnd = 0;
 
   // Mount UI elements.
   root.appendChild(letexUI);
@@ -31,6 +31,8 @@ export default function latexEditor(root) {
     .catch(console.error);
 
   // ---- Handlers ----------------
+
+  const saveCaretPos = () => selectionEnd = refs.input.selectionEnd;
 
   const filterCommands = ({key, keyCode}) => {
     if (keyCode !== 40 && keyCode !== 38) {
@@ -88,7 +90,7 @@ export default function latexEditor(root) {
 
   const applyMathML = () => {
     const math = MathJax.Hub.getAllJax(refs.render)[0];
-    onMathRenderCallback && onMathRenderCallback(math.root.toMathML(), refs.input.value);
+    onMathApplyCallback && onMathApplyCallback(math.root.toMathML(), refs.input.value);
   };
 
   const detectTexAction = ({target}) => {
@@ -123,6 +125,7 @@ export default function latexEditor(root) {
 
   // ---- Listeners ----------------
 
+  refs.input.addEventListener('blur', saveCaretPos);
   refs.input.addEventListener('keyup', filterCommands);
   refs.input.addEventListener('keydown', detectArrows);
   refs.controls.addEventListener('click', detectTexAction);
@@ -130,7 +133,7 @@ export default function latexEditor(root) {
 
   // ---- API methods ----------------
 
-  const onMathRender = (callback) => onMathRenderCallback = callback;
+  const onMathApply = (callback) => onMathApplyCallback = callback;
 
   const toggle = () => {
     const status = letexUI.classList.toggle('show');
@@ -142,5 +145,11 @@ export default function latexEditor(root) {
     ? send(latex, refs.useblock.checked).then((json) => json.result)
     : singleRender(latex).then(parseMathJax).then((json) => json.result);
 
-  return {toggle, onMathRender, render}
+  const addFormula = (latex) => {
+    refs.input.focus();
+    refs.input.setSelectionRange(selectionEnd, selectionEnd);
+    document.execCommand('insertText', null, latex);
+  };
+
+  return {toggle, onMathApply, render, addFormula}
 };

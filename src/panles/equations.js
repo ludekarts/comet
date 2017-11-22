@@ -10,23 +10,26 @@ const scaffold = `
 `;
 
 
-export default (() => {
+export default (editor) => {
 
   const equations = [];
   const singleRender = latexToMML();
   const [element, refs] = template(scaffold);
-  scrollbar.initialize(refs.content, {maxScrollbarLength: 90});
 
+  let onPlaceMMLCallback, onPlaceLatexCallback;
+
+  scrollbar.initialize(refs.content, {maxScrollbarLength: 90});
 
   const detectAction = ({target}) => {
     if (!target.dataset.hash) return;
     const hash = parseInt(target.dataset.hash);
     const equation = equations[equations.findIndex(math => math.hash === hash)];
-    if (equation){
+    if (equation) {
       const selection = document.getSelection();
-      console.log(selection);
-
-      console.log(equation);
+      if (selection.anchorNode && editor.contains(selection.anchorNode))
+        onPlaceMMLCallback && onPlaceMMLCallback(equation.mml);
+      else
+        onPlaceLatexCallback && onPlaceLatexCallback(equation.latex);
     }
   };
 
@@ -47,5 +50,8 @@ export default (() => {
     }
   };
 
-  return {element, add}
-})();
+  const onPlaceMML = (callback) => onPlaceMMLCallback = callback;
+  const onPlaceLatex = (callback) => onPlaceLatexCallback = callback;
+
+  return {element, add, onPlaceLatex, onPlaceMML}
+};

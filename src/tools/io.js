@@ -1,11 +1,11 @@
-import fs from 'fs';
+import fs from "fs";
 import {remote} from "electron";
 
 // Load XML file.
 export const xmlLoader = (path) => new Promise((resolve, reject) => {
 
   const load = (url) => {
-    if (!url) return reject(new Error('No url'));
+    if (!url) return resolve(undefined);
     url = url[0];
     fs.readFile(url, 'utf8', (error, data) => {
       if (error) reject(error);
@@ -35,3 +35,21 @@ export const exist = (path) => new Promise((resolve) => {
     resolve(!error);
   });
 });
+
+export const saveFile = (content) => {
+  remote.dialog.showSaveDialog((filePath) => {
+    if (!filePath) return undefined
+
+    fs.writeFile(filePath, content, (err) => {
+      if (!err) {
+        remote.dialog.showMessageBox({
+          title : 'Comet',
+          buttons: ['OK'],
+          message: 'The file has been saved!'
+        });
+      } else {
+        remote.dialog.showErrorBox('File save error', err.message);
+      }
+    });
+  });
+};

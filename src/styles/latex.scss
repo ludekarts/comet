@@ -42,6 +42,10 @@ latex > div {
     text-align: center;
     position: relative;
 
+    & .MJXc-display {
+      margin: 0;
+    }
+
     & > span {
       top: 50%;
       left: 50%;
