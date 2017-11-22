@@ -1,3 +1,4 @@
+import size from "./size";
 
 // Transfrom array of objects in to JS object,
 // stores each entry under the key pulled from the object.
@@ -7,8 +8,14 @@ export const arrayToObject = (array, key) =>
     return result;
   }, {});
 
+
 // Split string at index. -> splitAt(5)('HelloWord')
 export const splitAt = index => str => [str.slice(0, index), str.slice(index)];
+
+
+export const palceBetween = (source, value, position) =>
+  source.slice(0, position) + value + source.slice(position + value.length - 1, source.length);
+
 
 // Fortam XML input.
 export const formatXml = (xml) => {
@@ -41,9 +48,11 @@ export const formatXml = (xml) => {
     // .replace(/ /g, '&nbsp;');
 };
 
+
 // Create random uid.
 export const uid = () =>
   'ked-' + ((+new Date) + Math.random()* 100).toString(32).replace('.', '_');
+
 
 // Create Element from source string.
 export const elFromString = (source) =>
@@ -60,11 +69,16 @@ export const moveNodes = (from, to) => {
 export const copyAttrs = (from, to, excluded = []) =>
   Array.from(from.attributes || []).forEach(attr => !~excluded.indexOf(attr.name) && to.setAttribute(attr.name, attr.value));
 
+
 // Encode Base 64
 export const base64 = (str) =>
   btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, (match, p1) =>
     String.fromCharCode('0x' + p1)
   ));
+
+// Create hashCode from string.
+export const hashCode = (source) =>
+  source.split("").reduce((a, b) => { a = (( a << 5) - a) + b.charCodeAt(0); return a&a }, 0);
 
 // Debounce callback fn.
 export const debounce = (callback, wait, immediate) => {
@@ -79,6 +93,7 @@ export const debounce = (callback, wait, immediate) => {
 		if (immediate && !timeout) callback.apply(this, args);
 	};
 };
+
 
 // Debounce callback fn as promise.
 export const debouncePromise = (func, wait, immediate) => {
@@ -99,6 +114,7 @@ export const debouncePromise = (func, wait, immediate) => {
   };
 };
 
+
 // Call callback function on firt call & wait for given amount of time, to callit again.
 export const pause = (callback, wait) => {
   let timeout, block = false;
@@ -111,6 +127,7 @@ export const pause = (callback, wait) => {
     }
   };
 };
+
 
 // Call callback function if it is called within delta time range.
 export const inDeltaTime = (callback, delta) => {
@@ -135,7 +152,7 @@ export const loopstack = (length, counter = 0) => {
       if (!item) return;
       stack[counter] = item;
       counter = (counter === length - 1) ? 0 : (counter += 1);
-      // console.log(stack); // Debug.
+      console.log(size({stack})); // Debug.
     },
     pull (def) {
       counter = (counter === 0) ? length - 1 : (counter -= 1);
@@ -145,6 +162,7 @@ export const loopstack = (length, counter = 0) => {
     }
   }
 };
+
 
 // Helper for copying text to clipboard.
 export const clipboard = (root) => {
@@ -182,4 +200,31 @@ export const fuzzysearch = (chars, stack) => {
     return false;
   }
   return true;
+};
+
+
+// Modifier function with memory.
+export const Memo = (modifier, previous) => {
+  if (typeof modifier !== 'function') throw "Modifier need to be a function.";
+  return (current) => {
+    //NOTE: To memoize previous value you need to return it from the 'modifier'.
+    previous = modifier(current, previous);
+    return previous;
+  }
+};
+
+// Collect all parentNode elments begin from given 'node' and end on 'div[content=true]'
+export const getPath = (node, path = [node]) => {
+  if (!node.parentNode.matches('div[content=true]')) {
+    path.push(node.parentNode);
+    return getPath(node.parentNode, path)
+  }
+  return path;
+};
+
+
+export const getNodesOut = (from) => {
+  if (from.childNodes.length === 0) return from.parentNode.removeChild(from);
+  from.parentNode.insertBefore(from.firstChild, from);
+  getNodesOut(from);
 };

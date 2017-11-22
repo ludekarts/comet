@@ -23,52 +23,44 @@ export const wrapMath = (content) => {
 
 
 /**
- * Renders given LaTeX formula to the buffer node.
- * @param  {String}       latex LaTeX formula that need to be render.
- * @return {HTMLElement}        Element with new MathJax nodes.
+ * Update MathJax inside given HTMLElement with new MML.
+ * @param  {String}       mml new MathML content.
+ * @param  {HTMLElement}  element Reference to the element that need to be updated.
+ * @return {Promise}
  */
-export const singleMathRender = (latex) => {
-  const nodeBuffer = document.createElement('span');
-  nodeBuffer.textContent = `$${latex}$`;
-  MathJax.Hub.Queue(["Typeset", MathJax.Hub, nodeBuffer]);
-  return nodeBuffer;
-};
 
-
-/**
- * Renders given LaTeX formula to the buffer node & returns promise.
- * @param  {String}       latex LaTeX formula that need to be render.
- * @return {Promise}            Promise with new MathJax element.
- */
-export const singleMathPromise = (latex) => new Promise((resolve) => {
-  const nodeBuffer = document.createElement('span');
-  nodeBuffer.innerHTML = `$${latex}$`;
-  MathJax.Hub.Queue(["Typeset", MathJax.Hub, nodeBuffer, resolve.bind(this, nodeBuffer)]);
+export const updateMath = (element, mml) => new Promise((resolve) => {
+  element.innerHTML = mml;
+  MathJax.Hub.Queue(["Typeset", MathJax.Hub, element, () => {
+    element.dataset.mathId = element.querySelector('script').id;
+    resolve(mml);
+  }]);
 });
 
 
 /**
- * Update MathJax in given element with new LaTeX formula.
- * @param  {String}       latex LaTeX formula for update.
- * @param  {HTMLElement}  element Reference to the element that need to be updated.
- * @return {Undefined}
+ * Render MML markup in gien container.
+ * @param  {HTMLElement} container DOM node thet contains math to render.
+ * @return {Promise}               Promise resolves when math is ready.
  */
-export const updateMath = (latex, element) => {
-  const MathMl = MathJax.Hub.getAllJax(element)[0];
-  if (MathMl.inputJax === 'MathML') {
-    const NewJax = MathJax.Hub.getAllJax(singleMathRender(latex))[0];
-    if (NewJax && MathMl) MathMl.Text(NewJax.root.toMathML());
-    else return;
-  }
-  else MathMl.Text(latex);
-  return element;
-};
+export const renderMath = (container) => new Promise((resolve) =>
+  MathJax.Hub.Queue(["Typeset", MathJax.Hub, container, () => resolve(container)]));
 
 
 /**
- * Run MathJax render.
- * @param  {Function} callback Functions that will be called after math is rendered.
- * @return {Undefined}
+ * Create hidden node in document.body to render math in it and returns
+ * rendered math with the node.
+ * @return {Function} New functin that returns Promise which is reday when
+ *                    the LaTeX formula is ready.
  */
-export const renderMath = (container) => new Promise((resolve) =>
-  MathJax.Hub.Queue(["Typeset", MathJax.Hub, container, resolve]));
+export const latexToMML = () => {
+  const buffer = document.createElement('span');
+  buffer.style.position = "absolute";
+  buffer.style.left = "-9999px";
+  buffer.innerHTML = '$x$';
+  document.body.appendChild(buffer);
+  return (latex) => new Promise((resolve) => {
+    buffer.innerHTML = `$${latex}$`;
+    MathJax.Hub.Queue(["Typeset", MathJax.Hub, buffer, resolve.bind(this, buffer)]);
+  });
+};

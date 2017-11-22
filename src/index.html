@@ -11,136 +11,47 @@
         tex2jax: {inlineMath: [["$", "$"]]}
       };
     </script>
-    <link rel="stylesheet" href="styles/main.scss"/>
-    <!-- <script src="http://localhost/projects/api/mj/mathjax/unpacked/MathJax.js?config=TeX-MML-AM_CHTML" charset="utf-8"></script> -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" charset="utf-8"></script>
+    <link rel="stylesheet" href="styles/comet.scss"/>
+    <script src="http://localhost/projects/api/mj/mathjax/unpacked/MathJax.js?config=TeX-MML-AM_CHTML" charset="utf-8"></script>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" charset="utf-8"></script> -->
   </head>
   <body>
-    <section id="workspace" class="workspace">
-      <div class="xmlview">
-        <div id="editor" contenteditable="true"></div>
+    <header>
+      <div class="drag"></div>
+      <div class="logo">
+        <img src="icons/png/32x32.png" alt="☄">
+        <span>Comet</span>
       </div>
-      <div class="latexview">
-        <div id="controls" class="buttons">
-          <button class="cbtn" data-action="out">Output</button>
-          <button class="cbtn" data-action="help">Help</button>
-          <button class="cbtn" data-action="eq">Equations</button>
-        </div>
-        <div id="input" class="input" contenteditable="true">LaTeX</div>
-        <div id="preview">$LaTeX$</div>
+      <button class="minimize" title="minimize" data-action="minimize"></button>
+      <button class="maximize" title="maximize" data-action="maximize"></button>
+      <button class="close" title="close" data-action="close"></button>
+    </header>
+    <main>
+      <logo>
+        <img src="icons/png/512x512.png" alt="☄">
+        <span class="name">comet</span>
+        <span class="open">Press here, or <strong>Ctrl + O</strong> to start</span>
+      </logo>
+    </main>
+    <aside></aside>
+    <latex></latex>
+    <output>
+      <textarea></textarea>
+      <span class="message hide">Copied to clipboard</span>
+      <button class="copy" data-action="copy">Copy</button>
+      <button class="save" data-action="save">Save</button>
+    </output>
+    <footer>
+      <div id="breadcrumbs" class="breadcrumbs"></div>
+      <div id="menu" class="menu">
+        <button data-action="latex" title="F2">LaTeX</button>
+        <button data-action="equs" title="Alt + e">Equations</button>
+        <button data-action="wraps" title="Alt + w">Wrappers</button>
+        <button data-action="output" title="Alt + x">Output</button>
+        <button data-action="help" title="Alt + h">Help</button>
       </div>
-    </section>
-    <section id="output" class="output">
-      <textarea class="cnxmlout"></textarea>
-      <button id="outClose">Close</button>
-    </section>
+    </footer>
 
-    <section id="intro" class="intro show">
-      <h2><img src="icons/comet.svg" alt=""><span class="cm">Comet</span>  <button id="introClose">×</button></h2>
-      <hr>
-      <div class="intro-content">
-        <h3>Manual</h3>
-        <p>To <u>Quick Start</u> press <code>Ctrl + O</code> to pick <u>XML</u> file to precess.</p>
-        <br>
-
-        <h4>Main keyboard shortcuts</h4>
-        <ul>
-          <li><code>F2</code> - Replace active Math element with LaTeX formula</li>
-          <li><code>Tab</code> - When fous on XML, tabs through math elements</li>
-          <li><code>Tab</code> - When fous on LaTeX, tabs through LaTeX formuas matches to user's input</li>
-          <li><code>Esc</code> - Close any popup</li>
-
-          <li><code>Ctrl + O</code> - Open new XML file</li>
-          <li><code>Ctrl + Z</code> - When fous on XML it undo edit action on XML content</li>
-          <li><code>Ctrl + Z</code> - When fous on LaTeX it undo edit action on LaTeX input</li>
-          <li><code>Ctrl + Space</code> - Toggle equations lobrary</li>
-
-          <li><code>Alt + X</code> - Display output XML</li>
-          <li><code>Alt + W</code> - Wrap selected text in provided element or template</li>
-          <li><code>Alt + Q</code> - Unwrap element with caret in it</li>
-        </ul>
-
-        <h4>Elements features</h4>
-        <ul>
-          <li><code>Ctrl + XML Element</code> - Get element ID</li>
-          <li><code>Alt + XML Element</code> - Open attributes panel</li>
-          <li><code>Ctrl + Math Element</code> - Copy MathML markup to the clipboard</li>
-        </ul>
-
-        <h4>Attributes Panel</h4>
-        <p>
-          To <u>add</u> or <u>edit</u> an attribute, you need to click on the XML element holding <u>Alt</u> key.
-          Then on the top input in <u>Attributes Panel</u> type the name of the attribute then <code>=</code> and value of the attribute.
-          E.g. <code>name=John</code> After that press <u>Enter</u> to create attibute entry.
-        </p>
-
-        <p>
-          Attributes Panel allows you to use <u>attribute templates</u>. They can provide a sets of predefined attibutes for the elements.
-          To use any of them type on the top input <code>@</code> then name of the template. E.g. <code>@link</code>
-        </p>
-        <ul>
-          <li><code>Double Enter Press</code> - Save atributes for the element</li>
-          <li><code>Shift + Del</code> - When caret is on the attribute input, removes this attribute</li>
-        </ul>
-
-        <h4>Wrappers</h4>
-        <ul>
-          <li><code>[</code> - Puts open & closing bracket, it also wraps selected text with this bracktets</li>
-          <li><code>{</code> - Puts open & closing bracket, it also wraps selected text with this bracktets</li>
-          <li><code>(</code> - Puts open & closing bracket, it also wraps selected text with this bracktets</li>
-          <li><code>|</code> - Puts open & closing pipe, it also wraps selected text with the pipes</li>
-          <li><code>Alt + ↑</code> - Wraps selected text with <code>\left \right</code> operator</li>
-          <li><code>Ctrl + i</code> - When used on selected text in XML content wraps it in italic styles</li>
-          <li><code>Ctrl + i</code> - When used on selected text in LaTeX input wraps text in <code>\mathrm {}</code> operator</li>
-        </ul>
-
-        <h4>Available element templates</h4>
-        <ul>
-          <li><code>@m</code> - Transform selected text into math element</li>
-          <li><code>@ext</code> - <code class="pre">&lt;link document="docID" target-id="ID" /&gt;</code></li>
-          <li><code>@chap</code> - <code class="pre">&lt;link document="docID" class="target-chapter" /&gt;</code></li>
-          <li><code>@link</code> - <code class="pre">&lt;link target-id="ID" xmlns:cmlnle="http://katalysteducation.org/cmlnle/1.0" cmlnle:template="Rysunku %n" /&gt;</code></li>
-          <li><code>@term</code> - <code class="pre">&lt;term xmlns:cmlnle="http://katalysteducation.org/cmlnle/1.0" cmlnle:reference="form" &gt;TREM&lt;/term&gt;</code></li>
-        </ul>
-
-        <h4>Supported LaTeX operators in autocomplete</h4>
-        <ul>
-          <li>
-            <code>mu</code>
-            <code>pi</code>
-            <code>int</code>
-            <code>sum</code>
-            <code>vec</code>
-            <code>phi</code>
-            <code>cdot</code>
-            <code>circ</code>
-            <code>oint</code>
-            <code>over</code>
-            <code>frac</code>
-            <code>text</code>
-            <code>left</code>
-            <code>sqrt</code>
-            <code>theta</code>
-            <code>Delta</code>
-            <code>right</code>
-            <code>times</code>
-            <code>omega</code>
-            <code>sigma</code>
-            <code>limits</code>
-            <code>varphi</code>
-            <code>lambda</code>
-            <code>mathrm</code>
-            <code>widehat</code>
-            <code>overline</code>
-            <code>textstyle</code>
-            <code>varepsilon</code>
-            <code>boldsymbol</code>
-            <code>operatorname</code>
-            <code>overrightarrow</code>
-          </li>
-        </ul>
-      </div>
-    </section>
     <script type="text/javascript">
       require('./core/comet.js');
     </script>

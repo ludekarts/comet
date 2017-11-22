@@ -1,0 +1,82 @@
+
+// ---- Application Header Styles ----------------
+
+header {
+  width: 100%;
+  height: 32px;
+  z-index: 1000;
+  display: block;
+  padding: 0 10px;
+  text-align: right;
+  position: relative;
+  background: #242328;
+  border-bottom: 1px solid #1b191c;
+
+  & > div.drag {
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 85px;
+    position: absolute;
+    background: transparent;
+    -webkit-app-region: drag;
+  }
+
+  & > div.logo {
+    float: left;
+    margin: 6px 0px 3px -5px;
+
+    & > img {
+      width: 20px;
+      height: 20px;
+    }
+
+    & > span {
+      color: #ba2363;
+      font-size: 11px;
+      margin-left: 5px;
+      font-weight: bold;
+      font-family: Tahoma;
+      vertical-align: super;
+    }
+  }
+
+  & > button {
+    padding: 0;
+    width: 12px;
+    height: 12px;
+    border: none;
+    z-index: 100;
+    cursor: pointer;
+    border-radius: 50%;
+    position: relative;
+    display: inline-block;
+    margin: 10px 3px 11px 3px;
+    transition: background .3s ease;
+
+    &:focus {
+      outline: none;
+    }
+
+    &.close {
+      background: #c44b42;
+      &:hover {
+        background: #d05a51;
+      }
+    }
+
+    &.minimize {
+      background: #eaa513;
+      &:hover {
+        background: #f0c306;
+      }
+    }
+
+    &.maximize {
+      background: #249d34;
+      &:hover {
+        background: #29b83c;
+      }
+    }
+  }
+}

@@ -1,0 +1,15 @@
+@import "../../node_modules/perfect-scrollbar/dist/css/perfect-scrollbar.css";
+// Base.
+@import "./base.scss";
+// Core.
+@import "./main.scss";
+@import "./aside.scss";
+@import "./header.scss";
+@import "./output.scss";
+@import "./footer.scss";
+// Extras.
+@import "./math.scss";
+@import "./latex.scss";
+@import "./cnxml.scss";
+@import "./search.scss";
+@import "./switch.scss";

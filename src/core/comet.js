@@ -1,299 +1,329 @@
+// Electron.
+import {remote} from "electron";
 
 // Vendors.
-import fs from 'fs';
-import {remote} from "electron";
-import ps from "perfect-scrollbar";
+import scrollbar from "perfect-scrollbar";
 
-// Components.
-import Wrapper from "./wrapper";
-import AttrsEditor from "./attrs";
+// Core.
+import Search from "./search";
 import Navigator from "./navigator";
-import EquationsPanel from "./equations";
 
-// Templates.
-import {commands} from "../templates/latex";
+// Parser.
+import toHTML from "../parser/tohtml";
+import {toXML, cleanMath} from "../parser/toxml";
 
 // Tools.
 import wrapp from "../tools/wrapp";
-import toHTML from "../parser/tohtml";
-import {endCaret} from "../tools/caret";
-import Keytracker from "../tools/keytracker";
-import {toXML, cleanMath} from "../parser/toxml";
-import {addComand, wrapCommand, switchCommands} from "../tools/cmds";
-import {loopstack, pause, debounce, debouncePromise, clipboard, formatXml} from "../tools/utils";
-import {wrapMath, singleMathRender, updateMath, renderMath, singleMathPromise} from "../tools/math";
+import minimate from "../tools/minimate";
+import {createElement} from "../tools/travrs";
+import {xmlLoader, saveFile} from "../tools/io";
+import {renderMath, wrapMath, updateMath} from "../tools/math";
+import {Memo, getPath, formatXml, loopstack} from "../tools/utils";
+
+// Editors.
+import latexInit from "../editors/latex";
+import mediaEditor from "../editors/media";
+import attribsEditor from "../editors/attributes";
+
+// Panles.
+import equations from "../panles/equations";
+import wrappersPanel from "../panles/wrappers";
 
 // UI references.
-const introClose = document.getElementById('introClose');
-const workspace = document.getElementById('workspace');
-const outClose = document.getElementById('outClose');
-const controls = document.getElementById('controls');
-const preview = document.getElementById('preview');
-const output = document.getElementById('output');
-const editor = document.getElementById('editor');
-const input = document.getElementById('input');
-const intro = document.getElementById('intro');
+const menu = document.querySelector('#menu');
+const latex = document.querySelector('latex');
+const editor = document.querySelector('main');
+const header = document.querySelector('header');
+const output = document.querySelector('output');
+const sidePanel = document.querySelector('aside');
+const breadcrumbs = document.querySelector('#breadcrumbs');
 
-const dialog = remote.dialog;
+// Setup.
+const history = loopstack(20);
+const latexEditor = latexInit(latex);
+const equationsPanel = equations(editor);
 
-// Input history.
-const recordLatexState = () => {
-  state.latexHistory.push(input.textContent);
-};
+// Scrollbars.
+scrollbar.initialize(editor, {maxScrollbarLength: 90});
+scrollbar.initialize(output.firstElementChild, {maxScrollbarLength: 90});
 
-const restoreLatexState = () => {
-  input.textContent = state.latexHistory.pull();
-  endCaret(input);
-};
-
-const recordXmlState = () => {
-  state.xmlHistory.push(cleanMath(editor.cloneNode(true)).innerHTML);
-};
-
-const restoreXmlState = () => {
-  editor.innerHTML = state.xmlHistory.pull();
-  reRenderMath();
-};
-
-// Global state.
-const state = {
-  buffer: '',
-  equation: undefined,
-  getCommand: undefined,
-  cmdReference: undefined,
-  xmlHistory: loopstack(10),
-  latexHistory: loopstack(30)
-};
-
-// Global methods.
+// Globals.
+let currentEditor;
 const navigator = Navigator();
-const keytracker =  Keytracker();
-const clip = clipboard(workspace);
-const renderXMLMath = wrapMath(editor);
-const saveXmlHistory = pause(recordXmlState, 1000);
-const saveLatexHistory = pause(recordLatexState, 1500);
-const checkBuffer = debouncePromise(filterCmds(commands), 300);
-const renderMathPrview = debounce(() => updateMath(input.textContent, preview), 500);
+const search = Search(document.body, editor);
 
-// Append editor.
-workspace.appendChild(Wrapper.element);
-workspace.appendChild(AttrsEditor.element);
-workspace.appendChild(EquationsPanel.element);
-workspace.appendChild(EquationsPanel.element);
-
-// Add scrollbar.
-ps.initialize(editor);
-ps.initialize(intro.querySelector('.intro-content'));
-
-
-// Wrap selection with wrappers.
-const wrapSelectedText = (template) => () => {
-  wrapp.withText(template);
-  recordLatexState();
+// Selectors for the editors.
+const editors = {
+  'div[data-type=media]': mediaEditor,
+  'span[data-inline=link]': attribsEditor,
+  'span[data-inline=term]': attribsEditor,
+  'span[data-inline=foreign]': attribsEditor,
+  'span[data-inline=emphasis]': attribsEditor,
 };
 
-// Tab key handler.
-const tabThrough = (event) => {
-  // Tab commands in input.
-  if (event.target.matches('#input')) {
-    event.preventDefault();
-    if (state.cmdReference) {
-      state.cmdReference.textContent = state.getCommand();
-      endCaret(state.cmdReference);
-      recordLatexState();
-    }
-  }
-  // Tab through equations in XML.
-  else if (event.target.matches('#editor')) {
-    event.preventDefault();
-    navigator.next().scrollIntoView();
-    editor.scrollTop = editor.scrollTop - 60;
-  }
-};
+// Editor list for quick reference.
+const editorsList = Object.keys(editors);
 
-// Wrap buffer with \mathrm command.
-const wrapWithCommand = (buffer) => (event) => {
-  if (event.target.matches('#input')) {
-    event.preventDefault();
-    wrapCommand('\\mathrm', buffer).then((node) => {
-      recordLatexState();
-      endCaret(node);
-    });
-  }
-};
+// Ignore click events for those nodes.
+const ignoreNodes = [
+  'body',
+  'main',
+  'logo',
+  'div[data-type=figure]',
+  'div[data-type=section]'
+];
 
-// Filter commands base on buffer string.
-function filterCmds (commands) {
-  return (buffer) => {
-    buffer = buffer.trim();
-    return (buffer.length > 1)
-      ? commands
-        .filter(cmd => ~cmd.indexOf(buffer))
-        .sort((a, b) => {
-          const index = b.indexOf(buffer) - a.indexOf(buffer);
-          return !!index ? index : b.length - a.length;
-        })
-      : [];
-  };
-};
+// ---- Helpers ----------------
 
-// Change current selected equation according to latex input.
-const updateLatex = () => {
-  EquationsPanel.add(input.textContent, navigator.update(input.textContent))
-  recordXmlState();
-};
+const getName = (node) => node.dataset.type || node.dataset.inline;
+const hasEditor = (node) => !!editorsList.find(selector => node.matches(selector));
+const getSelector = (node) => node.dataset.type
+  ? `div[data-type=${node.dataset.type}]`
+  : `span[data-inline=${node.dataset.inline}]`;
 
-// Re-render math after adding new instance to the editor.
-Wrapper.onAddMath(navigator.select.bind(null,'span.jax-math'));
-EquationsPanel.onAddMath(navigator.select.bind(null,'span.jax-math'));
+const recordState = () => history.push(editor.cloneNode(true).innerHTML);
+const restoreState = () => editor.innerHTML = history.pull();
 
-// Undo handler.
-const restoreHistory = ({target}) => {
-  if (target.matches('#input')) {
-    restoreLatexState();
-  }
-  else if (target.matches('#editor')) {
-    restoreXmlState();
-    navigator.select('span.jax-math');
-  }
-};
 
-const exportToXML = () => {
-  output.firstElementChild.value = formatXml(toXML(cleanMath(editor.firstElementChild.cloneNode(true))));
-  output.classList.add('show');
-};
+// ---- Glue Logic ----------------
 
-const hidePanels = () => {
-  Wrapper.hide();
-  AttrsEditor.hide();
-  EquationsPanel.hide();
-};
+const reRenderMath = (editor) =>
+  renderMath(editor).then(wrapMath);
 
-function reRenderMath() {
-  renderMath(editor).then(() => {
-    wrapMath(editor);
-    navigator.select('span.jax-math');
+const insertMath = (mml) => {
+  const math = wrapp.selection(createElement('span'), {
+    'class': 'jax-math',
+    'data-type': 'math',
+    'contenteditable': 'false'
   });
-}
+  updateMath(math, mml);
+};
 
 const parse = (xml) => {
+  if (!xml) return;
   editor.innerHTML = '';
-  // Append new XML.
   editor.appendChild(toHTML(xml));
-  // Inintil Histroy state.
-  recordXmlState();
-  // Setup math renndering.
-  reRenderMath();
-  // Hide help panel.
-  toggleIntro(false);
+  reRenderMath(editor).then(recordState);
 };
 
-const closeOutput = () => {
-  output.classList.remove('show');
+const displayPath = (root) => {
+  const path = getPath(root);
+
+  breadcrumbs.innerHTML = path
+    .reverse()
+    .filter(node => node.dataset.type || node.dataset.inline)
+    .reduce(
+      (result, node, index) =>
+        result +=`
+        <span class="breadcrumb" data-num="${index}">
+          ${node.dataset.type || node.dataset.inline}
+        </span> » `, ''
+    ).slice(0, -3);
 };
 
-// Load XML file.
-const openXmlFile = () => {
-  dialog.showOpenDialog({
-    properties: ['openFile'],
-    filters: [{
-      name: 'Xml',
-      extensions: ['xml', 'cnxml']
-    }]
-  }, (url) => {
-    if (!url) return;
-    url = url[0];
-      fs.readFile(url, 'utf8', (err, data) => {
-        if (err) throw err;
-        parse(data);
-    });
-  });
+const swapSidePanel = (content) => {
+  sidePanel.classList.add('show');
+  sidePanel.firstElementChild && sidePanel.removeChild(sidePanel.firstElementChild);
+  sidePanel.appendChild(content);
 };
 
-const toggleIntro = (flag) => {
-  if (flag === undefined) intro.classList.toggle('show');
-  else if (flag === true) intro.classList.add('show');
-  else if (flag === false) intro.classList.remove('show');
+const activeNode = Memo((current, active) => {
+  if (active !== current) {
+    if (active) {
+       active.contentEditable = false;
+      if (active.dataset) active.dataset.empty = false;
+      if (active.textContent.length === 0) active.dataset.empty = true;
+    }
+    active = current;
+    active.contentEditable = true;
+  }
+  return active;
+});
+
+
+const editMeta = ({target}) => {
+  if (target.matches && target.matches('div[data-type=metadata]')) {
+    target.classList.toggle('expand');
+  }
 }
 
-// Handle controll buttons.
-const controler = ({target}) => {
-  const action = target.dataset.action;
-  if (action === 'out') exportToXML();
-  if (action === 'help') toggleIntro(true);
-  if (action === 'eq') EquationsPanel.toggle();
-};
+const editNode = ({target, altKey}) => {
+  // console.log(target); // Debug.
 
+  // Handel open file button.
+  if (target.matches('span.open')) return toggleFileLoader();
 
-// ---- Setup keyboard events ------------
+  // Skip ignoreNodes.
+  if (ignoreNodes.find(selector => target.matches(selector))) return;
 
-keytracker
-  .onkey('F2', updateLatex)
-  .onkey('Escape', hidePanels)
-  .onkey('x', 'alt', exportToXML)
-  .onkey('o', 'ctrl', openXmlFile)
-  .onkey('w', 'alt', Wrapper.show)
-  .onkey('z', 'ctrl', restoreHistory)
-  .onkey('[', wrapSelectedText('[*]'))
-  .onkey('Tab', '!prevent', tabThrough)
-  .onkey(' ', 'ctrl', EquationsPanel.toggle)
-  .onkey('|', 'shift', wrapSelectedText('|*|'))
-  .onkey('{', 'shift', wrapSelectedText('{*}'))
-  .onkey('(', 'shift', wrapSelectedText('(*)'))
-  .onkey('q', 'alt', wrapp.remove.bind(null, '#editor'))
-  .onkey('ArrowUp', 'alt', wrapSelectedText('\\left*\\right'))
-  .onkey('i', 'ctrl', '!prevent', wrapWithCommand(state.buffer));
-
-
-// ---- Event handlers ----------------
-
-const interceptKeys = (event) => {
-  const {target, keyCode, shiftKey, ctrlKey} = event;
-  // Save history.
-  if (!ctrlKey && !shiftKey && keyCode !== 27 && keyCode !== 13 ) {
-    if (target.matches('#input')) saveLatexHistory();
-    else if (target.matches('#editor')) saveXmlHistory();
+  // Handel Maths.
+  if (target.dataset.type === 'math') {
+    navigator.select('span.jax-math').set(target);
+    displayPath(target);
+    search.clear();
+    return;
   }
-  renderMathPrview();
-  keytracker.test(event);
+
+  // Handel inline elements.
+  if (hasEditor(target)) {
+    const selector = getSelector(target);
+    currentEditor = editors[selector];
+    // Fail gracefully.
+    if (!currentEditor) return console.warn(`Canont find editor for "${selector}" selector.`);
+    // Run Editor.
+    swapSidePanel(currentEditor.element);
+    currentEditor.edit(target, getName(target));
+    navigator.select(selector).set(target);
+    search.clear();
+    displayPath(target);
+  }
+
+  // Handel edit node selection.
+  else {
+    displayPath(activeNode(target.dataset.empty ? target : window.getSelection().anchorNode.parentNode));
+  }
 };
 
-const keypressHandler = ({key, keyCode}) => {
-  // All except Tab.
-  if (keyCode !== 9) {
-    checkBuffer(state.buffer += key)
-      .then((cmds) => {
-        if (cmds.length > 0) {
-          // Set global references.
-          state.getCommand = switchCommands(cmds);
-          state.cmdReference = addComand(cmds.slice(-1)[0], state.buffer);
-          endCaret(state.cmdReference);
-        }
-        state.buffer = '';
-      });
-      state.cmdReference = null;
+const detectAppAction = ({target}) => {
+  const action = target.dataset.action;
+  if (!action) return;
+  else if (action === 'close') remote.getCurrentWindow().close();
+  else if (action === 'maximize') remote.getCurrentWindow().maximize();
+  else if (action === 'minimize') remote.getCurrentWindow().minimize();
+}
+
+// ---- Components configuration ----------------
+
+// Select founded text string.
+search.onFound(() => navigator.select('span.found'));
+
+// Replace selected MathJax equation.
+latexEditor.onMathApply((mml, latex) => {
+  const node = navigator.current();
+  if (node.dataset.type !== 'math') return;
+  updateMath(node, mml);
+  equationsPanel.add(mml, latex);
+});
+
+// Convert selected text into math.
+wrappersPanel.onMathWrapp((selection) => latexEditor.render(selection).then(insertMath));
+
+// Hide Attributes editor on it's demand.
+attribsEditor.onClose(() => sidePanel.classList.remove('show'));
+
+// Place LaTeX formula from equationsPanel into latexEditor.
+equationsPanel.onPlaceLatex((latex) => latexEditor.addFormula(latex));
+
+// Insert MathJax node into CNXML content.
+equationsPanel.onPlaceMML(insertMath);
+
+// ---- Toggle Panels ----------------
+
+const toggleLatex = () =>
+  (editor.style.bottom = latexEditor.toggle() ? '240px' : '29px');
+
+const toggleOutput = () =>
+  output.classList.toggle('show') &&
+    (output.firstElementChild.value = formatXml(toXML(cleanMath(editor.firstElementChild.cloneNode(true)))));
+
+const toggleWrappers = () =>
+  sidePanel.classList.toggle('show') && swapSidePanel(wrappersPanel.element);
+
+const toggleEquations = () =>
+  sidePanel.classList.toggle('show') && swapSidePanel(equationsPanel.element);
+
+const toggleFileLoader = () =>
+  xmlLoader().then(parse).catch(console.error);
+
+const detectAction = ({target}) => {
+  const action = target.dataset.action;
+  if (!action) return;
+
+  switch (action) {
+    case 'latex':
+      return toggleLatex();
+    case 'output':
+      return toggleOutput();
+    case 'wraps':
+      return toggleWrappers();
+    case 'equs':
+      return toggleEquations();
+  }
+};
+
+// ---- Keyboard shortcuts ----------------
+
+const keyboard = (event) => {
+  const {keyCode, key, altKey, ctrlKey, shiftKey} = event;
+
+  if (key === 'F2') toggleLatex();
+  if (key === 'F3') search.toggle();
+
+  // Escape.
+  if (keyCode === 27) {
+    !sidePanel.classList.contains('show') && navigator.deselect();
+    sidePanel.classList.remove('show') ;
+    output.classList.remove('show');
+    currentEditor = undefined;
+  }
+
+  // Tab.
+  if (keyCode === 9) {
+    // Make selection.
+    event.preventDefault();
+    navigator.next().scrollIntoView();
+    editor.scrollTop = editor.scrollTop - 80;
+
+    // Use editor
+    if (currentEditor) {
+      const node = navigator.current();
+      const name = getName(node);
+      // Update editor with new selected node if not 'math'.
+      name !== 'math' && currentEditor.edit(node, name);
     }
+  }
+
+  // Ctrl + Shift + Z.
+  if (ctrlKey && shiftKey && keyCode === 90)(event.preventDefault(), restoreState());
+  // Ctrl + S.
+  if (ctrlKey && keyCode === 83) recordState();
+  // Alt + W.
+  if (altKey && keyCode === 87) toggleWrappers();
+  // Alt + X.
+  if (altKey && keyCode === 88) toggleOutput();
+
+  // Ctrl + O.
+  if (ctrlKey && keyCode === 79) toggleFileLoader();
+    // Ctrl + Space.
+  if (ctrlKey && keyCode === 32) (event.preventDefault(), toggleEquations());
+
+  // Brackets & quotes wrapper.
+  if (key === '[') (event.preventDefault(), wrapp.withText('[^]'));
+  else if (key === '(') (event.preventDefault(), wrapp.withText('(^)'));
+  else if (key === '{') (event.preventDefault(), wrapp.withText('{^}'));
+  else if (key === '"') (event.preventDefault(), wrapp.withText('"^"'));
+  else if (key === '\'') (event.preventDefault(), wrapp.withText('\'^\''));
 };
 
-// Detect element clicked with Alt key.
-const detectElement = ({target, altKey, ctrlKey}) => {
-  const isMath = target.matches('span.jax-math');
-  // Activate math element.
-  if (isMath) navigator.set(target);
-  // Copy element ID.
-  if (ctrlKey && !isMath && target.id) clip(target.id);
-  // Open Attribute editor.
-  if (altKey && !isMath) (AttrsEditor.select(target), EquationsPanel.hide());
-  // Copy MML to the clipboard
-  if (ctrlKey && isMath) clip(target.querySelector('span[data-mathml]').dataset.mathml);
+const outputHandlers = ({target}) => {
+  const action = target.dataset.action;
+  if (!action) return;
+  if (action === 'copy') {
+    output.firstElementChild.select();
+    document.execCommand('copy');
+    minimate(output.querySelector('span.message')).add('show').remove('show', 2);
+  }
+  else if (action === 'save') {
+    saveFile(output.firstElementChild.value);
+  }
 };
 
 
-// ---- Event listeners ----------------
+// ---- Listeners -----------------------
 
-controls.addEventListener('click', controler);
-outClose.addEventListener('click', closeOutput);
-editor.addEventListener('click', detectElement);
-input.addEventListener('keyup', keypressHandler);
-document.addEventListener('keydown', interceptKeys);
-introClose.addEventListener('click', toggleIntro.bind(null, false));
+editor.addEventListener('click', editNode);
+editor.addEventListener('dblclick', editMeta);
+menu.addEventListener('click', detectAction);
+output.addEventListener('click', outputHandlers);
+header.addEventListener('click', detectAppAction);
+document.addEventListener('keydown', keyboard);

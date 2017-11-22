@@ -14,7 +14,7 @@ export default (function wrapp() {
 
 
   /**
-   *  Wrap 'elements' with HTMLElement of given 'type' with provided 'attrs'.
+   *  Wrap list of elements with new HTMLElement of given 'type' with provided 'attrs'.
    *  EXAMPLE: wrapp.elements(node, 'del', { "data-skip-merge" : true });
    * @param  {Array|HTMLElement} els   List or element to wrap.
    * @param  {String}            type  Type of wrapper element.
@@ -69,7 +69,7 @@ export default (function wrapp() {
 
 
   /**
-   * Remove wrapper el. from the given element or if element is not provided
+   * Remove wrapper el. from given element or if element is not provided
    * remove wrapper el. from the element containing caret.
    * @param  {HTMLElement|Undefined} element Element that need to be unwrpped.
    * @param  {String}                stopAt  Selector that can't be unwrapped.
@@ -88,20 +88,18 @@ export default (function wrapp() {
 
 
    /**
-    * Wrapp selection with wrappers separateb by *.
-    * EXAMPLE: wrapp.withText('[*]');
-    * @param  {String}     template String ccontaining wrapper elements separated by *.
+    * Wrapp selection with wrappers separateb by ^.
+    * EXAMPLE: wrapp.withText('[^]');
+    * @param  {String}     template String ccontaining wrapper elements separated by ^.
     * @return {Undefined}
     */
    const withText = (template) => {
-     const wraps = template.split('*');
+     const wraps = template.split('^');
      const selection = window.getSelection();
-     const range = selection.getRangeAt(0);
-     const selectedText = range.toString();
-     document.execCommand("insertHTML", false, wraps[0] + selectedText + wraps[1]);
+     const selectedText = selection.toString();
+     document.execCommand("insertText", false, wraps[0] + selectedText + wraps[1]);
      if (selectedText.length === 0) selection.modify('move', 'backward', 'character');
    };
-
 
 
   return { elements, selection, withText, remove };

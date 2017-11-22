@@ -3,20 +3,23 @@ import {createElement} from "../tools/travrs";
 
 
 // Do not pars those elements.
-const excluded = ['math', 'link', 'term', 'emphasis'];
+const inlineElements = ['link', 'term', 'emphasis', 'foreign'];
 
 // Create new 'x-tag' element from the Editable element.
 const cloneElement = (clone, node) => {
-
   // Copy text node.
   if (node.nodeType === 3) return clone.appendChild(document.createTextNode(node.textContent));
 
-  // Create new child.
-  const newChild = node.nodeType !== 3
-    ? node.tagName && !~excluded.indexOf(node.tagName.toLowerCase())
+  // Clone math, block and inline elements.
+  const newChild = (node.tagName === 'math' || node.nodeType === 8)
+    ? node.cloneNode(true)
+    : node.tagName && !~inlineElements.indexOf(node.tagName.toLowerCase())
       ? createElement(`div[data-type="${node.tagName}"]`)
-      : node.cloneNode(true)
-    : document.createTextNode(node.textContent);
+      : createElement(`span[data-inline="${node.tagName}"]`,
+        node.textContent.length === 0
+          ? node.tagName.toLowerCase()
+          : node.cloneNode(true)
+        );
 
   // Copy attrinytes;
   copyAttrs(node, newChild);
@@ -34,14 +37,7 @@ const clone = (node, double) => {
   return double;
 };
 
-// ---- TRANSFORMATIONS ----------------
-
-const transformLinks = (node) => {
-  const reference = createElement('reference', node.innerHTML.length > 0 ? node.innerHTML : 'REFERENCE');
-  copyAttrs(node, reference);
-  node.parentNode.replaceChild(reference, node);
-  return reference;
-};
+// ---- Main ----------------
 
 export default function toHtml(source) {
   const processXml = source
@@ -58,9 +54,7 @@ export default function toHtml(source) {
   const parser = new DOMParser();
   const xml = parser.parseFromString(processXml, "application/xml");
   const output = clone(xml, createElement('div'));
-
-  // Post transformations.
-  Array.from(output.querySelectorAll('link')).forEach(transformLinks);
+  output.setAttribute('content', true);
 
   return output;
 };

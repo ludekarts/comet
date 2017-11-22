@@ -1,23 +1,159 @@
-emphasis[effect=italics], i {
+
+// ---- Inline styles ----------------
+
+span[data-inline]:focus {
+  outline: none !important;
+}
+
+span[data-inline=emphasis][effect=italics] {
   font-style: italic;
   color: #eeac00;
 }
 
-emphasis[effect=bold], b {
+span[data-inline=emphasis][effect=bold] {
   font-weight: bold;
   color: #4092da;
 }
 
-reference {
+span[data-inline=link] {
   text-decoration: underline;
   color: #0ebfe6;
 }
 
-term {
+span[data-inline=term] {
   font-weight: bold;
   color: #d613d8;
 }
 
+span[data-inline=foreign] {
+  font-weight: bold;
+  color: #9913d7;
+}
+
+// ---- Block styles ----------------
+
+div[data-type] {
+  margin: 5px 0;
+}
+
+div[data-type][contentEditable=true] {
+  outline: none;
+  margin-left: -8px;
+  padding-left: 5px;
+  border-left: 3px solid #f5c304;
+}
+
+div[data-empty=true] {
+  height: 20px;
+  overflow: hidden;
+  position: relative;
+  transition: background .3s ease;
+  background: rgba(235, 26, 76, 0.2);
+
+  &::before {
+    top: 0px;
+    right: 0px;
+    color: white;
+    display: block;
+    font-size: 10px;
+    padding: 0px 4px;
+    position: absolute;
+    background: #eb1a4c;
+    content: attr(data-type);
+    text-transform: uppercase;
+  }
+}
+
+div[data-type=metadata] {
+  height: 25px;
+  overflow: hidden;
+  padding-top: 30px;
+  border-radius: 5px;
+  position: relative;
+  background: #282c34;
+
+  &::before {
+    top:0;
+    left: 0;
+    right: 0;
+    padding: 5px;
+    height: 1800px;
+    display: block;
+    cursor: pointer;
+    content: 'Metadata ❱❱';
+    position: absolute;
+  }
+
+  &.expand {
+    height: auto;
+    padding: 30px 10px 10px 10px;
+    &::before {
+      height: 25px;
+    }
+  }
+}
+
+div[data-type=title] {
+  color: #cacaca;
+  font-size: 15px;
+  margin-top: 25px;
+  font-weight: bold;
+}
+
+div[data-type=glossary] {
+  padding: 10px;
+  border: 1px solid #d613d8;
+}
+
+// Figures.
+div[data-type=figure] {
+  padding: 5px;
+  margin: 5px 0;
+  user-select: none;
+  text-align: center;
+}
+
+div[data-type=media] {
+  padding: 4px;
+  user-select: none;
+  position: relative;
+  &::before {
+    top: 0;
+    left: 0;
+    z-index: 10;
+    width: 100%;
+    height: 100%;
+    content: ' ';
+    position: absolute;
+  }
+}
+
+div[data-type=image] {
+  width: 300px;
+  height: 210px;
+  margin: 0 auto;
+  display: block;
+  user-select: none;
+  text-align: center;
+  position: relative;
+  background: #282c34;
+  border-radius: 15px;
+
+  &::before {
+    top: 50%;
+    left: 50%;
+    padding: 10px;
+    display: block;
+    max-width: 300px;
+    max-height: 210px;
+    content: attr(src);
+    position: absolute;
+    transform: translateX(-50%) translateY(-50%);
+  }
+}
+
+
+// Tables.
 div[data-type=table] {
   width: 100%;
   display: table;

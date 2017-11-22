@@ -1,0 +1,167 @@
+
+// ---- LaTeX Editor Styles ----------------
+
+latex > div {
+  width: 100%;
+  bottom: -200px;
+  display: block;
+  position: fixed;
+  background: #242427;
+  transition: bottom .4s ease;
+  border-top: 1px solid #1b1b1d;
+
+  &.show {
+    bottom: 28px;
+  }
+
+  & > div.input {
+    color: #5f6267;
+    background: #1b1b1d;
+
+    & > input {
+      width: 100%;
+      color: white;
+      border: none;
+      padding: 15px;
+      font-size: 14px;
+      background: none;
+      text-align: center;
+
+      &:focus {
+        outline: none;
+        box-shadow: inset 0 -1px 0 #12e5ab;
+      }
+    }
+  }
+
+  & > div.render {
+    color: #ddd;
+    padding: 5px;
+    height: 74px;
+    font-size: 16px;
+    text-align: center;
+    position: relative;
+
+    & .MJXc-display {
+      margin: 0;
+    }
+
+    & > span {
+      top: 50%;
+      left: 50%;
+      position: absolute;
+      transform: translateY(-50%) translateX(-50%);
+    }
+  }
+
+  & > div.controls {
+    width: 100%;
+    padding: 7px 15px;
+    text-align: right;
+    background: #242328;
+  }
+
+  & > ul.messages {
+    height: 60px;
+    padding: 15px;
+    color: #91959e;
+    font-size: 12px;
+    background: #28282b;
+    border-top: 1px solid #1b1b1d;
+
+    & > li {
+      color: #c44b42;
+      list-style: none;
+      line-height: 10px;
+      margin-bottom: 10px;
+    }
+  }
+
+  & > ul.suggestions {
+    right: 0;
+    color: #ddd;
+    width: 320px;
+    bottom: 217px;
+    overflow-y: auto;
+    max-height: 350px;
+    position: absolute;
+    background: #242427;
+
+    & > li {
+      color: #ddd;
+      cursor: pointer;
+      list-style: none;
+      padding: 6px 10px;
+      position: relative;
+      border-bottom: 1px solid #1b1b1d;
+      transition: background .3s ease;
+
+      &::before {
+        top:0;
+        left:0;
+        width: 100%;
+        height: 100%;
+        content: ' ';
+        position: absolute;
+        background: transparent;
+      }
+
+      &:hover, &.active {
+        background: #28282b;
+         & > i.dot {
+          background: #12e5ab;
+         }
+      }
+
+      & > i.dot {
+        width: 13px;
+        height: 13px;
+        border-radius: 50%;
+        margin-right: 10px;
+        display: inline-block;
+        vertical-align: middle;
+        border: 2px solid #12e5ab;
+        transition: background .3s ease;
+      }
+    }
+  }
+
+  // Buttons override.
+  button.render {
+    color: #ddd;
+    margin: 0 15px;
+    background: #1b1b1d;
+
+    &:hover {
+      background: #294dba;
+    }
+  }
+
+  button.apply {
+    color: #1b1b1d;
+    background: #12e5ab;
+
+    &:hover {
+      background: #0d8c69;
+    }
+  }
+
+  // Toggle switch override.
+  span.tex-switch {
+    float: left;
+    color: #c9c9c9;
+
+    & .slider:before,
+    & input:checked + .slider {
+      background-color: #6d1293;
+    }
+
+    & input:checked + .slider:before {
+      background-color: #c9c9c9;
+    }
+
+    & input:focus + .slider {
+      box-shadow: 0 0 1px #6d1293;
+    }
+  }
+}

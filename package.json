@@ -1,7 +1,7 @@
 {
   "name": "comet",
-  "version": "0.1.1",
-  "description": "Tool for editing MML equations in CNXML documents, and more.",
+  "version": "0.2.0",
+  "description": "Tool for editing content and MML equations in CNXML documents",
   "main": "src/main.js",
   "scripts": {
     "make": "electron-forge make",
