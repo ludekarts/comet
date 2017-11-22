@@ -56,7 +56,6 @@ export default function latexEditor(root) {
     }
     else if (keyCode === 13) {
       event.preventDefault();
-
       if (ctrlKey) return renderMathML();
       if (shiftKey) return applyMathML();
 
@@ -84,11 +83,14 @@ export default function latexEditor(root) {
   // ---- Actions ----------------
 
   const renderMathML = () =>
-    !refs.usejax.checked
-      ? send(refs.input.value, refs.useblock.checked).then(renderPreview)
-      : singleRender(refs.input.value).then(parseMathJax).then(renderPreview);
+    !!refs.input.value.length
+      ? !refs.usejax.checked
+          ? send(refs.input.value, refs.useblock.checked).then(renderPreview)
+          : singleRender(refs.input.value).then(parseMathJax).then(renderPreview)
+      : false;
 
   const applyMathML = () => {
+    if (!refs.render.textContent.length) return;
     const math = MathJax.Hub.getAllJax(refs.render)[0];
     onMathApplyCallback && onMathApplyCallback(math.root.toMathML(), refs.input.value);
   };

@@ -1,3 +1,5 @@
+import size from "./size";
+
 // Transfrom array of objects in to JS object,
 // stores each entry under the key pulled from the object.
 export const arrayToObject = (array, key) =>
@@ -150,7 +152,7 @@ export const loopstack = (length, counter = 0) => {
       if (!item) return;
       stack[counter] = item;
       counter = (counter === length - 1) ? 0 : (counter += 1);
-      // console.log(stack); // Debug.
+      console.log(size({stack})); // Debug.
     },
     pull (def) {
       counter = (counter === 0) ? length - 1 : (counter -= 1);

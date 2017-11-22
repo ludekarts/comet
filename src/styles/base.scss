@@ -58,13 +58,25 @@ logo {
     display: block;
     cursor: pointer;
     background: none;
-    margin: 20px auto;
+    margin: 20px auto;    
     position: relative;
     padding: 10px 15px;
     text-align: center;
     border-radius: 50px;
     border: 2px solid #242328;
     transition: background .3s ease, color .3s ease;
+
+    &:before {
+      top:0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 10;
+      content: ' ';
+      position: absolute;
+      background: transparent;
+    }
+
     &:hover {
       color: #1b191c;
       background: #ba2363;

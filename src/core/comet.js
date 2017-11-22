@@ -1,3 +1,6 @@
+// Electron.
+import {remote} from "electron";
+
 // Vendors.
 import scrollbar from "perfect-scrollbar";
 
@@ -15,7 +18,7 @@ import minimate from "../tools/minimate";
 import {createElement} from "../tools/travrs";
 import {xmlLoader, saveFile} from "../tools/io";
 import {renderMath, wrapMath, updateMath} from "../tools/math";
-import {Memo, getPath, formatXml, classie} from "../tools/utils";
+import {Memo, getPath, formatXml, loopstack} from "../tools/utils";
 
 // Editors.
 import latexInit from "../editors/latex";
@@ -30,11 +33,13 @@ import wrappersPanel from "../panles/wrappers";
 const menu = document.querySelector('#menu');
 const latex = document.querySelector('latex');
 const editor = document.querySelector('main');
+const header = document.querySelector('header');
 const output = document.querySelector('output');
 const sidePanel = document.querySelector('aside');
 const breadcrumbs = document.querySelector('#breadcrumbs');
 
 // Setup.
+const history = loopstack(20);
 const latexEditor = latexInit(latex);
 const equationsPanel = equations(editor);
 
@@ -76,6 +81,9 @@ const getSelector = (node) => node.dataset.type
   ? `div[data-type=${node.dataset.type}]`
   : `span[data-inline=${node.dataset.inline}]`;
 
+const recordState = () => history.push(editor.cloneNode(true).innerHTML);
+const restoreState = () => editor.innerHTML = history.pull();
+
 
 // ---- Glue Logic ----------------
 
@@ -92,9 +100,10 @@ const insertMath = (mml) => {
 };
 
 const parse = (xml) => {
+  if (!xml) return;
   editor.innerHTML = '';
   editor.appendChild(toHTML(xml));
-  reRenderMath(editor);
+  reRenderMath(editor).then(recordState);
 };
 
 const displayPath = (root) => {
@@ -175,6 +184,13 @@ const editNode = ({target, altKey}) => {
   }
 };
 
+const detectAppAction = ({target}) => {
+  const action = target.dataset.action;
+  if (!action) return;
+  else if (action === 'close') remote.getCurrentWindow().close();
+  else if (action === 'maximize') remote.getCurrentWindow().maximize();
+  else if (action === 'minimize') remote.getCurrentWindow().minimize();
+}
 
 // ---- Components configuration ----------------
 
@@ -238,7 +254,7 @@ const detectAction = ({target}) => {
 // ---- Keyboard shortcuts ----------------
 
 const keyboard = (event) => {
-  const {keyCode, key, altKey, ctrlKey} = event;
+  const {keyCode, key, altKey, ctrlKey, shiftKey} = event;
 
   if (key === 'F2') toggleLatex();
   if (key === 'F3') search.toggle();
@@ -267,12 +283,16 @@ const keyboard = (event) => {
     }
   }
 
-  // Alt + w.
+  // Ctrl + Shift + Z.
+  if (ctrlKey && shiftKey && keyCode === 90)(event.preventDefault(), restoreState());
+  // Ctrl + S.
+  if (ctrlKey && keyCode === 83) recordState();
+  // Alt + W.
   if (altKey && keyCode === 87) toggleWrappers();
-  // Alt + x.
+  // Alt + X.
   if (altKey && keyCode === 88) toggleOutput();
 
-  // Ctrl + o.
+  // Ctrl + O.
   if (ctrlKey && keyCode === 79) toggleFileLoader();
     // Ctrl + Space.
   if (ctrlKey && keyCode === 32) (event.preventDefault(), toggleEquations());
@@ -298,8 +318,12 @@ const outputHandlers = ({target}) => {
   }
 };
 
+
+// ---- Listeners -----------------------
+
 editor.addEventListener('click', editNode);
 editor.addEventListener('dblclick', editMeta);
 menu.addEventListener('click', detectAction);
 output.addEventListener('click', outputHandlers);
+header.addEventListener('click', detectAppAction);
 document.addEventListener('keydown', keyboard);

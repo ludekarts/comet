@@ -13,7 +13,7 @@ function createWindow () {
   win = new BrowserWindow({
     width: 1200,
     height: 700,
-    frame: true,
+    frame: false,
     icon: path.join(__dirname, 'icons/png/64x64.png')
   });
 

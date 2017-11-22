@@ -17,10 +17,14 @@
   </head>
   <body>
     <header>
-      <img src="icons/png/32x32.png" alt="☄">
-      <button class="minimize" title="minimize"></button>
-      <button class="maximize" title="maximize"></button>
-      <button class="close" title="close"></button>
+      <div class="drag"></div>
+      <div class="logo">
+        <img src="icons/png/32x32.png" alt="☄">
+        <span>Comet</span>
+      </div>
+      <button class="minimize" title="minimize" data-action="minimize"></button>
+      <button class="maximize" title="maximize" data-action="maximize"></button>
+      <button class="close" title="close" data-action="close"></button>
     </header>
     <main>
       <logo>

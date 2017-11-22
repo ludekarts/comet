@@ -19,9 +19,12 @@
 + Equaions panel
 + Open file
 + Save file
-- Keyboard shortcuts
++ Welcome screen fixes
++ Header branding
++ Keyboard shortcuts
++ Frameless window
+- Add remove equation to equas. panel
 - Math-rendering preloader
 - Ctrl + z
-- Frameless window
 - Code cleanup
 - Help panel
