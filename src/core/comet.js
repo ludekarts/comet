@@ -1,4 +1,5 @@
 // Electron.
+// Electron.
 import {remote} from "electron";
 
 // Vendors.
@@ -26,6 +27,7 @@ import mediaEditor from "../editors/media";
 import attribsEditor from "../editors/attributes";
 
 // Panles.
+import help from "../panles/help";
 import equations from "../panles/equations";
 import wrappersPanel from "../panles/wrappers";
 
@@ -41,6 +43,7 @@ const breadcrumbs = document.querySelector('#breadcrumbs');
 // Setup.
 const history = loopstack(20);
 const latexEditor = latexInit(latex);
+const helpPanel = help(document.body);
 const equationsPanel = equations(editor);
 
 // Scrollbars.
@@ -232,8 +235,11 @@ const toggleWrappers = () =>
 const toggleEquations = () =>
   sidePanel.classList.toggle('show') && swapSidePanel(equationsPanel.element);
 
+const toggleHelp = () => helpPanel.toggle();
+
 const toggleFileLoader = () =>
   xmlLoader().then(parse).catch(console.error);
+
 
 const detectAction = ({target}) => {
   const action = target.dataset.action;
@@ -248,6 +254,8 @@ const detectAction = ({target}) => {
       return toggleWrappers();
     case 'equs':
       return toggleEquations();
+    case 'help':
+      return toggleHelp();
   }
 };
 
@@ -283,8 +291,12 @@ const keyboard = (event) => {
     }
   }
 
+  console.log(keyCode);
+
   // Ctrl + Shift + Z.
   if (ctrlKey && shiftKey && keyCode === 90)(event.preventDefault(), restoreState());
+  // Ctrl + H.
+  if (ctrlKey && keyCode === 72) toggleHelp();
   // Ctrl + S.
   if (ctrlKey && keyCode === 83) recordState();
   // Alt + W.

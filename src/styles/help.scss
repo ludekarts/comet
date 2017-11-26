@@ -1,0 +1,153 @@
+
+div.help {
+  left: 0;
+  top: 32px;
+  border:none;
+  width: 100%;
+  bottom: 28px;
+  position: fixed;
+  background: #1b1b1d;
+
+  /* hide */
+  opacity: 0;
+  z-index: 0;
+  overflow: hidden;
+  visibility:hidden;
+  transform: scale(0.95) translateZ(0);
+  transition: visibility 0s linear 0.5s, opacity .3s ease, transform .3s ease;
+
+  &.show {
+    /* show */
+    opacity: 1;
+    z-index: 3000;
+    visibility:visible;
+    transform: scale(1) translateZ(0);
+    transition: opacity .3s ease, transform .3s ease, visibility 0s;
+  }
+
+  & > div.content {
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 30px;
+    position: absolute;
+  }
+
+  & div.manual {
+    padding: 25px;
+    color: #8b8e97;
+    font-size: 16px;
+    line-height: 21px;
+    font-family: sans-serif;
+  }
+
+  & div.footer {
+    left: 0;
+    right: 0;
+    bottom: 0px;
+    padding: 5px;
+    position: absolute;
+    background: #242328;
+
+    & button {
+      color: #7c7f87;
+      margin-right: 5px;
+      background: #1b1b1d;
+
+      &:hover {
+        color: #ddd;
+        background: #ba2363;
+      }
+    }
+  }
+
+  & div.space {
+    width: 100%;
+    height: 25px;
+  }
+
+  & div.about {
+    left: 50%;
+    top: 50%;
+    width: 400px;
+    margin: 0 auto;
+    text-align: center;
+    position: absolute;
+    transform: translate3D(-50%,-50%,0);
+  }
+
+  // Text styles.
+
+  & h1 {
+    margin: 0px;
+    color: #ba2363;
+    font-size: 32px;
+    line-height: 32px;
+  }
+
+  & h2 {
+    margin: 0px;
+    color: #ba2363;
+    font-size: 24px;
+    line-height: 24px;
+  }
+
+  & h3 {
+    margin: 0px;
+    color: #ba2363;
+    font-size: 18px;
+    line-height: 18px;
+  }
+
+  & hr {
+    border: none;
+    margin: 15px 0 25px 0;
+    border-bottom: 1px solid #28282b;
+  }
+
+  & p {
+     margin-top: 10px;
+     margin-bottom: 5px;
+   }
+
+  & strong {
+    color: #ba2363;
+    font-weight: bold;
+  }
+
+  & a {
+    color: #767880;
+    &:hover {
+      color: #ba2363;
+    }
+  }
+
+  & ul,
+  & ol {
+    margin: 15px 0 10px 20px;
+     &.wide li {
+       margin: 5px 0;
+     }
+   }
+
+   & code {
+     color: #bbb;
+     border-radius: 3px;
+     background: #23225c;
+     padding: 0px 4px 2px 4px;
+   }
+
+   & span.subtext {
+     display: block;
+     color: #4e4f56;
+   }
+
+   // Colors.
+   .magenta {
+     color: #eb1a4c;
+   }
+
+   .yellow {
+     color: #f5c304;
+   }
+}
