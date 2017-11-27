@@ -22,6 +22,7 @@ export const manualPage = `
           li > "Type proper Tex formula inside LaTeX editor."
           li > "Click <strong>Render</strong> button or press <code>Ctrl + Enter</code> to preview equation."
           li > "Click <strong>Apply</strong> button or press <code>Shift + Enter</code> to replace seleccted equation."
+      li > "Above keyboard shortcuts works only if caret is in LaTeX input field."
       li > "By default the editor uses <strong>tex2mml converter</strong> to transform LaTeX formulas into MML equations. If converter fails it will display <code>⚔</code> symbol. In that case try to use error messages to find and fix the equation or as a last resort switch to <strong>MathJax render</strong> with a toggle on the editor panel."
       li > "As a default render style editor will use <strong>inline style</strong>. To change it, switch <strong>block toogle</strong> on the editor panel."
       li > "To use <strong>LaTeX autocomplete</strong> start typing inside LaTeX Editor. By default Comet sill use <strong>fuzzy seach</strong> but if you start typing your phrase with <code>\\</code> symbol it will go for the <strong>exaxt match</strong>. You can use arrows keys to navigate through autocomplete results."
@@ -52,6 +53,7 @@ export const manualPage = `
         ol.wide
           li > "Place caret inside XML content and press one of the equations insied the panel - this action will place rendered equation inside XML content."
           li > "Place caret inside LaTeX Editor and press one of the equations insied the panel - this action will place rendered equation inside the LaTeX Editor."
+      li > "To remove equation from the panel click on it holding <code>Alt</code> key."
     div.space
     h3 > "Output"
     p > "Contains output XML markup, that can be either copied or saved on a hard drive."
@@ -73,6 +75,7 @@ export const manualPage = `
       li > "<code>Esc</code> - Close displayed plane/ deselect."
       li > "<code>Ctrl + Z</code> - Undo previous operation (max 25 operations)."
       li > "<code>Ctrl + H</code> - Show Help panel."
+      li > "<code>Ctrl + W</code> - Close application."
 `;
 
 
@@ -80,7 +83,7 @@ export const attributionPage = `
   div.manual
     h1 > "Attribution"
     hr
-    p > "Many thanks to people collaborating on project that supports Comet:"
+    p > "Many thanks to people collaborating on projects that supports Comet:"
     ul.wide
       li
         a[href="#"] > "Electron"

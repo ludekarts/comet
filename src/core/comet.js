@@ -19,7 +19,7 @@ import minimate from "../tools/minimate";
 import {createElement} from "../tools/travrs";
 import {xmlLoader, saveFile} from "../tools/io";
 import {renderMath, wrapMath, updateMath} from "../tools/math";
-import {Memo, getPath, formatXml, loopstack} from "../tools/utils";
+import {Memo, getPath, formatXml, loopstack, pause, debounce, getChildOffsteAt, getSelectionRange} from "../tools/utils";
 
 // Editors.
 import latexInit from "../editors/latex";
@@ -28,6 +28,7 @@ import attribsEditor from "../editors/attributes";
 
 // Panles.
 import help from "../panles/help";
+import spinner from "../panles/spinner";
 import equations from "../panles/equations";
 import wrappersPanel from "../panles/wrappers";
 
@@ -41,17 +42,18 @@ const sidePanel = document.querySelector('aside');
 const breadcrumbs = document.querySelector('#breadcrumbs');
 
 // Setup.
-const history = loopstack(20);
+const history = loopstack(25);
 const latexEditor = latexInit(latex);
 const helpPanel = help(document.body);
 const equationsPanel = equations(editor);
+const spinnerPanel = spinner(document.body);
 
 // Scrollbars.
 scrollbar.initialize(editor, {maxScrollbarLength: 90});
 scrollbar.initialize(output.firstElementChild, {maxScrollbarLength: 90});
 
 // Globals.
-let currentEditor;
+let currentEditor, lastSelectedNode;
 const navigator = Navigator();
 const search = Search(document.body, editor);
 
@@ -84,14 +86,18 @@ const getSelector = (node) => node.dataset.type
   ? `div[data-type=${node.dataset.type}]`
   : `span[data-inline=${node.dataset.inline}]`;
 
-const recordState = () => history.push(editor.cloneNode(true).innerHTML);
-const restoreState = () => editor.innerHTML = history.pull();
+const recordState = () => {
+  const content = editor.cloneNode(true).innerHTML;
+  if (content !== history.head()) history.push(content);
+};
+const saveHistory = pause(recordState, 1000);
+const restoreState = () => {
+  const snapshot = history.pull();
+  if (snapshot) editor.innerHTML = snapshot;    
+};
 
 
 // ---- Glue Logic ----------------
-
-const reRenderMath = (editor) =>
-  renderMath(editor).then(wrapMath);
 
 const insertMath = (mml) => {
   const math = wrapp.selection(createElement('span'), {
@@ -99,14 +105,16 @@ const insertMath = (mml) => {
     'data-type': 'math',
     'contenteditable': 'false'
   });
-  updateMath(math, mml);
+  updateMath(math, mml).then(recordState);
 };
 
 const parse = (xml) => {
   if (!xml) return;
   editor.innerHTML = '';
-  editor.appendChild(toHTML(xml));
-  reRenderMath(editor).then(recordState);
+  toggleSpinner().then(() => {
+    editor.appendChild(toHTML(xml));
+    renderMath(editor).then(wrapMath).then(recordState).then(toggleSpinner);
+  })
 };
 
 const displayPath = (root) => {
@@ -204,15 +212,18 @@ search.onFound(() => navigator.select('span.found'));
 latexEditor.onMathApply((mml, latex) => {
   const node = navigator.current();
   if (node.dataset.type !== 'math') return;
-  updateMath(node, mml);
+  updateMath(node, mml).then(recordState);
   equationsPanel.add(mml, latex);
 });
 
 // Convert selected text into math.
 wrappersPanel.onMathWrapp((selection) => latexEditor.render(selection).then(insertMath));
 
-// Hide Attributes editor on it's demand.
+// Hide Attributes editor on it's demand (in this case onUnwrap).
 attribsEditor.onClose(() => sidePanel.classList.remove('show'));
+
+// Save history whwn attributes are saved.
+attribsEditor.onSave(() => recordState());
 
 // Place LaTeX formula from equationsPanel into latexEditor.
 equationsPanel.onPlaceLatex((latex) => latexEditor.addFormula(latex));
@@ -237,9 +248,11 @@ const toggleEquations = () =>
 
 const toggleHelp = () => helpPanel.toggle();
 
+const toggleSpinner = () =>
+  new Promise((resolve) => (spinnerPanel.toggle(), setTimeout(resolve, 300)));
+
 const toggleFileLoader = () =>
   xmlLoader().then(parse).catch(console.error);
-
 
 const detectAction = ({target}) => {
   const action = target.dataset.action;
@@ -262,17 +275,20 @@ const detectAction = ({target}) => {
 // ---- Keyboard shortcuts ----------------
 
 const keyboard = (event) => {
-  const {keyCode, key, altKey, ctrlKey, shiftKey} = event;
+  const {keyCode, key, altKey, ctrlKey, shiftKey, target} = event;
+  const isEditable = !target.matches('input');
 
-  if (key === 'F2') toggleLatex();
-  if (key === 'F3') search.toggle();
+  // Function keys.
+  if (key === 'F2') return toggleLatex();
+  if (key === 'F3') return search.toggle();
 
-  // Escape.
+  // Esc.
   if (keyCode === 27) {
     !sidePanel.classList.contains('show') && navigator.deselect();
-    sidePanel.classList.remove('show') ;
+    sidePanel.classList.remove('show');
     output.classList.remove('show');
     currentEditor = undefined;
+    return;
   }
 
   // Tab.
@@ -289,25 +305,22 @@ const keyboard = (event) => {
       // Update editor with new selected node if not 'math'.
       name !== 'math' && currentEditor.edit(node, name);
     }
+    return;
   }
 
-  console.log(keyCode);
-
-  // Ctrl + Shift + Z.
-  if (ctrlKey && shiftKey && keyCode === 90)(event.preventDefault(), restoreState());
+  // Ctrl + Z.
+  if (ctrlKey && keyCode === 90 && isEditable) return (event.preventDefault(), restoreState());
   // Ctrl + H.
-  if (ctrlKey && keyCode === 72) toggleHelp();
-  // Ctrl + S.
-  if (ctrlKey && keyCode === 83) recordState();
+  if (ctrlKey && keyCode === 72) return toggleHelp();
   // Alt + W.
-  if (altKey && keyCode === 87) toggleWrappers();
+  if (altKey && keyCode === 87) return toggleWrappers();
   // Alt + X.
-  if (altKey && keyCode === 88) toggleOutput();
+  if (altKey && keyCode === 88) return toggleOutput();
 
   // Ctrl + O.
-  if (ctrlKey && keyCode === 79) toggleFileLoader();
+  if (ctrlKey && keyCode === 79) return toggleFileLoader();
     // Ctrl + Space.
-  if (ctrlKey && keyCode === 32) (event.preventDefault(), toggleEquations());
+  if (ctrlKey && keyCode === 32) return (event.preventDefault(), toggleEquations());
 
   // Brackets & quotes wrapper.
   if (key === '[') (event.preventDefault(), wrapp.withText('[^]'));
@@ -315,6 +328,9 @@ const keyboard = (event) => {
   else if (key === '{') (event.preventDefault(), wrapp.withText('{^}'));
   else if (key === '"') (event.preventDefault(), wrapp.withText('"^"'));
   else if (key === '\'') (event.preventDefault(), wrapp.withText('\'^\''));
+
+  // Track edit changes.
+  if (!ctrlKey && !shiftKey && keyCode !== 27 && keyCode !== 13 && isEditable) saveHistory();
 };
 
 const outputHandlers = ({target}) => {

@@ -12,10 +12,11 @@ export const arrayToObject = (array, key) =>
 // Split string at index. -> splitAt(5)('HelloWord')
 export const splitAt = index => str => [str.slice(0, index), str.slice(index)];
 
-
 export const palceBetween = (source, value, position) =>
   source.slice(0, position) + value + source.slice(position + value.length - 1, source.length);
 
+export const appendChildren = (root, children) =>
+  Array.isArray(children) && children.forEach(child => root.appendChild(child));
 
 // Fortam XML input.
 export const formatXml = (xml) => {
@@ -159,6 +160,9 @@ export const loopstack = (length, counter = 0) => {
       head = stack[counter];
       stack[counter] = undefined;
       return head || def;
+    },
+    head () {
+      return stack[counter - 1];
     }
   }
 };
@@ -227,4 +231,61 @@ export const getNodesOut = (from) => {
   if (from.childNodes.length === 0) return from.parentNode.removeChild(from);
   from.parentNode.insertBefore(from.firstChild, from);
   getNodesOut(from);
+};
+
+// Return [text node, index] from element at general text position.
+export const getChildOffsteAt = (element, pos) => {
+  let counter = 0;
+  const child = Array.from(element.childNodes).find(node => {
+    counter += node.textContent.length;
+    return counter >= pos;
+  });
+
+  const offset = child.textContent.length - (counter - pos);
+  return child.nodeType === 3
+   ? [child, offset]
+   : getChildOffsteAt (child, offset);
+};
+
+
+// Get text index for the @element. It includes crop nodes.
+const getIndex = (stopAtNode, element, startAt, counter = 0) => {
+
+  if (!element) return 0;
+
+  if (element.previousSibling) {
+    if(element.previousSibling.nodeType === 3) {
+      // Parse text nodes.
+      counter += getIndex(stopAtNode, element.previousSibling);
+    }
+    else if (element.previousSibling.lastChild) {
+      // Move to the previous text node.
+      counter += getIndex(stopAtNode, element.previousSibling.lastChild);
+    }
+    else {
+      // Parse empty nodes.
+      counter += getIndex(stopAtNode, element.previousSibling.previousSibling);
+    }
+  } else if (!element.parentNode.matches(stopAtNode)) {
+      // Parse non-text nodes.
+      counter += getIndex(stopAtNode, element.parentNode);
+  }
+
+  return element.nodeType === 3 && startAt !== 0
+    ? (startAt || element.textContent.length) + counter
+    : counter;
+};
+
+export const getSelectionRange = (selector) => {
+  const selection = window.getSelection();
+  const range = selection.getRangeAt(0);
+  // console.log(range.startContainer, range.startOffset);
+  // console.log(range.endContainer, range.endOffset);
+  if (range.startContainer.nodeType === 3 && range.endContainer.nodeType === 3) {
+    const start = getIndex(selector, range.startContainer, range.startOffset);
+    const end = getIndex(selector, range.endContainer, range.endOffset);
+    return [start, end];
+  }
+
+  return [0, 0];
 };

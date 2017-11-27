@@ -24,8 +24,8 @@
 + ~~Keyboard shortcuts~~
 + ~~Frameless window~~
 + ~~Help panel~~
-- Attibues fromm templates
-- Add remove equation from equas. panel
-- Math-rendering preloader
-- Ctrl + z
++ ~~Attibues fromm templates~~
++ ~~Add remove equation from equas. panel~~
++ ~~Simple undo (Ctrl + z)~~
++ ~~Math-rendering preloader~~
 - Code cleanup

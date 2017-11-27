@@ -23,6 +23,7 @@ export default (root) => {
   scrollbar.initialize(refs.content, {maxScrollbarLength: 90});
 
   const showPage = (page) => {
+    refs.content.scrollTop = 0;
     const oldContent = refs.content.querySelector('div.manual');
     if (oldContent) refs.content.removeChild(oldContent);
     refs.content.appendChild(page);

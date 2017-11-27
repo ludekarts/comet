@@ -20,16 +20,25 @@ export default (editor) => {
 
   scrollbar.initialize(refs.content, {maxScrollbarLength: 90});
 
-  const detectAction = ({target}) => {
+  const detectAction = ({target, altKey}) => {
     if (!target.dataset.hash) return;
     const hash = parseInt(target.dataset.hash);
-    const equation = equations[equations.findIndex(math => math.hash === hash)];
+    const index = equations.findIndex(math => math.hash === hash);
+    const equation = equations[index];
     if (equation) {
-      const selection = document.getSelection();
-      if (selection.anchorNode && editor.contains(selection.anchorNode))
-        onPlaceMMLCallback && onPlaceMMLCallback(equation.mml);
-      else
-        onPlaceLatexCallback && onPlaceLatexCallback(equation.latex);
+      if (altKey) {
+        // Remove element.
+        equations.splice(index, 1);
+        console.log(equations);
+        target.parentNode.removeChild(target);
+      }
+      else {
+        const selection = document.getSelection();
+        if (selection.anchorNode && editor.contains(selection.anchorNode))
+          onPlaceMMLCallback && onPlaceMMLCallback(equation.mml);
+        else
+          onPlaceLatexCallback && onPlaceLatexCallback(equation.latex);
+      }
     }
   };
 

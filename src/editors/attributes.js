@@ -1,7 +1,8 @@
 import wrapp from "../tools/wrapp";
+import provider from "../data/provider";
 import scrollbar from "perfect-scrollbar";
-import {splitAt, inDeltaTime} from "../tools/utils";
 import {createElement, template} from "../tools/travrs";
+import {splitAt, inDeltaTime, appendChildren} from "../tools/utils";
 
 const scaffold = `
   div.editor
@@ -28,26 +29,16 @@ const attribute = (name, value) => template(`
 
 export default ((root) => {
 
-  let currentElement, onCloseCallback;
+  let currentElement, onCloseCallback, onSaveCallback, wrappers;
   const [element, refs] = template(scaffold);
   const excludedAttrs = ['contenteditable', 'data-inline', 'data-select'];
 
   scrollbar.initialize(refs.content, {maxScrollbarLength: 90});
 
-  const edit = (node, name) => {
-    currentElement = node;
-    // Clear panel.
-    refs.inputs.innerHTML = '';
-    // Header.
-    refs.header.innerHTML = `Inline edit <span>${name}</span>`;
-    // Content.
-    refs.text.value = node.textContent;
-    // Add attributes.
-    Array.from(node.attributes).forEach(attr => {
-      if (!excludedAttrs.includes(attr.name) && attr.value)
-        refs.inputs.appendChild(attribute(attr.name, attr.value));
-    });
-  };
+  // Feth list of all wrappers.
+  provider('wrappers').then((wraps) => wrappers = wraps);
+
+  // ---- Helpers ----------------
 
   const attrFromString = (string) => {
     const touple = splitAt(string.indexOf('='))(string);
@@ -56,12 +47,29 @@ export default ((root) => {
     return touple;
   };
 
+  const attrFromTemplate = (string) => {
+    const name = string.slice(1);
+    const wrapper = wrappers[wrappers.findIndex(wrapper => wrapper.name === name)];
+    if (!wrapper) return [];
+    let attrs = wrapper.attrs.match(/[\w-:]+=".+?"/g);
+    if (attrs) attrs = attrs.map(match => match.replace(/"/g,'').split('='));
+    console.log(attrs);
+    return attrs;
+  }
+
+  // ---- Hanlders ----------------
+
+  const addAttributes = (touples) =>
+    touples.forEach(touple => refs.inputs.appendChild(attribute(...touple)));
+
   const detectAction = ({target}) => {
     const action = target.dataset.action;
     if (!action) return;
 
     if (action === 'add' && refs.add.value.length > 0) {
-      refs.inputs.appendChild(attribute(...attrFromString(refs.add.value)));
+      refs.add.value.indexOf('@') === 0
+        ? addAttributes(attrFromTemplate(refs.add.value))
+        : addAttributes([attrFromString(refs.add.value)])
       refs.add.value = '';
     }
     else if (action === 'save') {
@@ -78,20 +86,42 @@ export default ((root) => {
         if (!excludedAttrs.includes(attr.name) && !newAttibutes.includes(attr.name))
           currentElement.removeAttribute(attr.name);
       });
+      // Callback.
+      onSaveCallback && onSaveCallback();
     }
     else if (action === 'delete') {
       refs.inputs.removeChild(target.parentNode);
     }
     else if (action === 'unwrap') {
-      wrapp.remove(currentElement);      
+      wrapp.remove(currentElement);
+      onSaveCallback && onSaveCallback();
       onCloseCallback && onCloseCallback();
     }
   };
 
+  // ---- API Mentods ----------------
+
+  const edit = (node, name) => {
+    currentElement = node;
+    // Clear panel.
+    refs.inputs.innerHTML = '';
+    // Header.
+    refs.header.innerHTML = `Inline edit <span>${name}</span>`;
+    // Content.
+    refs.text.value = node.textContent;
+    // Add attributes.
+    Array.from(node.attributes).forEach(attr => {
+      if (!excludedAttrs.includes(attr.name) && attr.value)
+        refs.inputs.appendChild(attribute(attr.name, attr.value));
+    });
+  };
+
+  const onSave = (callback) => onSaveCallback = callback;
   const onClose = (callback) => onCloseCallback = callback;
 
-  // Listeners.
+  // ---- Listeners ----------------
+
   element.addEventListener('click', detectAction);
 
-  return {element, edit, onClose}
+  return {element, edit, onClose, onSave}
 })();
