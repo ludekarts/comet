@@ -15,7 +15,13 @@ export const cleanMath = (source) => {
   return source;
 };
 
-const excludeAttribs = ['data-type', 'data-inline', 'data-select', 'data-empty', 'contenteditable'];
+const excludeAttribs = [
+  'data-type',
+  'data-empty',
+  'data-inline',
+  'data-select',
+  'contenteditable'
+];
 
 // Create new 'x-tag' element from the Editable element.
 const cloneElement = (clone, node) => {

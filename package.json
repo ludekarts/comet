@@ -1,6 +1,6 @@
 {
   "name": "comet",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Tool for editing content and MML equations in CNXML documents",
   "main": "src/main.js",
   "scripts": {

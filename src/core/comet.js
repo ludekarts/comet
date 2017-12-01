@@ -19,7 +19,10 @@ import minimate from "../tools/minimate";
 import {createElement} from "../tools/travrs";
 import {xmlLoader, saveFile} from "../tools/io";
 import {renderMath, wrapMath, updateMath} from "../tools/math";
-import {Memo, getPath, formatXml, loopstack, pause, debounce, getChildOffsteAt, getSelectionRange} from "../tools/utils";
+import {
+  Memo, getPath, formatXml, loopstack, pause, clipboard,
+  debounce, getChildOffsteAt, getSelectionRange
+} from "../tools/utils";
 
 // Editors.
 import latexInit from "../editors/latex";
@@ -44,6 +47,7 @@ const breadcrumbs = document.querySelector('#breadcrumbs');
 // Setup.
 const history = loopstack(25);
 const latexEditor = latexInit(latex);
+const clip = clipboard(document.body);
 const helpPanel = help(document.body);
 const equationsPanel = equations(editor);
 const spinnerPanel = spinner(document.body);
@@ -93,7 +97,7 @@ const recordState = () => {
 const saveHistory = pause(recordState, 1000);
 const restoreState = () => {
   const snapshot = history.pull();
-  if (snapshot) editor.innerHTML = snapshot;    
+  if (snapshot) editor.innerHTML = snapshot;
 };
 
 
@@ -158,8 +162,9 @@ const editMeta = ({target}) => {
   }
 }
 
-const editNode = ({target, altKey}) => {
+const editNode = ({target, ctrlKey}) => {
   // console.log(target); // Debug.
+  const isMath = target.matches('span.jax-math');
 
   // Handel open file button.
   if (target.matches('span.open')) return toggleFileLoader();
@@ -172,6 +177,9 @@ const editNode = ({target, altKey}) => {
     navigator.select('span.jax-math').set(target);
     displayPath(target);
     search.clear();
+
+    // Copy MML to the clipboard.
+    ctrlKey && isMath && clip(target.querySelector('span[data-mathml]').dataset.mathml);
     return;
   }
 
@@ -192,6 +200,8 @@ const editNode = ({target, altKey}) => {
   // Handel edit node selection.
   else {
     displayPath(activeNode(target.dataset.empty ? target : window.getSelection().anchorNode.parentNode));
+    // Copy element ID.
+    ctrlKey && !isMath && target.id && clip(target.id);
   }
 };
 
@@ -277,6 +287,7 @@ const detectAction = ({target}) => {
 const keyboard = (event) => {
   const {keyCode, key, altKey, ctrlKey, shiftKey, target} = event;
   const isEditable = !target.matches('input');
+
 
   // Function keys.
   if (key === 'F2') return toggleLatex();

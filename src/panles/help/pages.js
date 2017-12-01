@@ -76,6 +76,8 @@ export const manualPage = `
       li > "<code>Ctrl + Z</code> - Undo previous operation (max 25 operations)."
       li > "<code>Ctrl + H</code> - Show Help panel."
       li > "<code>Ctrl + W</code> - Close application."
+      li > "<code>Ctrl + Element</code> - Copy Element's ID."
+      li > "<code>Ctrl + Equation</code> - Copy equation's MML."
 `;
 
 
