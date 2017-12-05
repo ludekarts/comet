@@ -1,4 +1,4 @@
-import {enableLiveReload} from "electron-compile";
+// import {enableLiveReload} from "electron-compile";
 import {app, BrowserWindow} from "electron";
 import path from "path";
 import url from "url";
@@ -28,7 +28,7 @@ function createWindow () {
   win.on('closed', () => win = null);
 
   // Enabel Live reload & Open the DevTools.
-  enableLiveReload() && win.webContents.openDevTools();
+  // enableLiveReload() && win.webContents.openDevTools();
 }
 
 // This method will be called when Electron has finished

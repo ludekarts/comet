@@ -248,7 +248,7 @@ const toggleLatex = () =>
 
 const toggleOutput = () =>
   output.classList.toggle('show') &&
-    (output.firstElementChild.value = formatXml(toXML(cleanMath(editor.firstElementChild.cloneNode(true)))));
+    (output.firstElementChild.value = formatXml(toXML(editor.firstElementChild.cloneNode(true))));
 
 const toggleWrappers = () =>
   sidePanel.classList.toggle('show') && swapSidePanel(wrappersPanel.element);

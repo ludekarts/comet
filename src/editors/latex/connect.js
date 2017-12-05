@@ -5,10 +5,10 @@ const fetchConfig = (body) => ({
   mode: 'cors',
   method: 'post',
   cache: 'default',
-  body: '\\usepackage{math}\\begin{document}\\begin{math}' + body + '\\end{math}\\end{document}'
+  body: '\\usepackage{math}\\begin{document}\\begin{displaymath}' + body + '\\end{displaymath}\\end{document}'
 });
 
-export default function send (latex, isBlock = false) {
+export default function connect (latex, isBlock = false) {
   headers.has("x-display")
     ? headers.set("x-display", isBlock ? "block" : "inline")
     : headers.append("x-display", isBlock ? "block" : "inline");

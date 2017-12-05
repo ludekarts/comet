@@ -3,7 +3,7 @@ import {createElement} from "../tools/travrs";
 
 
 // Do not pars those elements.
-const inlineElements = ['link', 'term', 'emphasis', 'foreign'];
+const inlineElements = ['link', 'term', 'emphasis', 'foreign', 'sub', 'sup', 'quote'];
 
 // Create new 'x-tag' element from the Editable element.
 const cloneElement = (clone, node) => {

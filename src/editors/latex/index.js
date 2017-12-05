@@ -1,4 +1,4 @@
-import send from "./send";
+import connect from "./connect";
 import scrollbar from "perfect-scrollbar";
 import provider from "../../data/provider";
 import {letexUI, refs,newMessage} from "./ui";
@@ -85,7 +85,7 @@ export default function latexEditor(root) {
   const renderMathML = () =>
     !!refs.input.value.length
       ? !refs.usejax.checked
-          ? send(refs.input.value, refs.useblock.checked).then(renderPreview)
+          ? connect(refs.input.value, refs.useblock.checked).then(renderPreview)
           : singleRender(refs.input.value).then(parseMathJax).then(renderPreview)
       : false;
 
@@ -144,7 +144,7 @@ export default function latexEditor(root) {
   };
 
   const render = (latex) => !refs.usejax.checked
-    ? send(latex, refs.useblock.checked).then((json) => json.result)
+    ? connect(latex, refs.useblock.checked).then((json) => json.result)
     : singleRender(latex).then(parseMathJax).then((json) => json.result);
 
   const addFormula = (latex) => {

@@ -8,9 +8,11 @@ import wrapp from "./wrapp";
 export const wrapMath = (content) => {
   // Render all math and apply click wrapper.
   MathJax.Hub.getAllJax(content).forEach(math => {
-    const equation = content.querySelector(`#${math.inputID}-Frame`);
+    let equation = content.querySelector(`#${math.inputID}-Frame`);
+    // Detect Block equations.
+    if (equation.parentNode.classList.contains('MJXc-display')) equation = equation.parentNode;
     // MathJax generate 3 nodes per equation -> wrap them all in one OR skip if already exists.
-    if (!equation.parentNode.matches('span.jax-math')) {
+    if (!equation.parentNode.matches('span.jax-math')) {      
       const wrapper = wrapp.elements([equation.previousSibling, equation, equation.nextSibling], 'span');
       wrapper.className = 'jax-math';
       wrapper.dataset.type = 'math';

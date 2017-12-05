@@ -6,7 +6,7 @@ import {uid, copyAttrs, moveNodes} from "../tools/utils";
 // Find all Bridge-MathJax elements and extract MATHML markup.
 export const cleanMath = (source) => {
   Array.from(source.querySelectorAll('span[data-mathml]')).forEach(element => {
-    const parent = element.parentNode;
+    const parent = element.parentNode.classList.contains('MJXc-display') ? element.parentNode.parentNode : element.parentNode;
     const root = parent.parentNode;
     root.insertBefore(document.createRange().createContextualFragment(element.dataset.mathml), parent);
     root.removeChild(parent);
@@ -76,7 +76,6 @@ const transformUniqueIds = (collection = []) => (node) => {
 
 // Convert 'source' HTML tree into XML string.
 export const toXML = (htmlNode) => {
-
   // Check for duplicate IDs.
   Array.from(htmlNode.querySelectorAll('*[id]')).forEach(transformUniqueIds([]));
   // Clone source HTML node.
