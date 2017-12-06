@@ -1,11 +1,14 @@
 const headers = new Headers();
 
+// Use Version 1 of tex2mml (with SiUnitX).
+headers.set('X-Request-Version', 1);
+
 const fetchConfig = (body) => ({
   headers,
+  body: body,
   mode: 'cors',
   method: 'post',
-  cache: 'default',
-  body: '\\usepackage{math}\\begin{document}\\begin{displaymath}' + body + '\\end{displaymath}\\end{document}'
+  cache: 'default'
 });
 
 export default function connect (latex, isBlock = false) {

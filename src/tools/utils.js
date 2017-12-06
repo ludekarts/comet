@@ -12,9 +12,13 @@ export const arrayToObject = (array, key) =>
 // Split string at index. -> splitAt(5)('HelloWord')
 export const splitAt = index => str => [str.slice(0, index), str.slice(index)];
 
+
+// Place 'value' inside 'source' sctring at given 'position'.
 export const palceBetween = (source, value, position) =>
   source.slice(0, position) + value + source.slice(position + value.length - 1, source.length);
 
+
+// Append children from 'children' aray into 'root' element.
 export const appendChildren = (root, children) =>
   Array.isArray(children) && children.forEach(child => root.appendChild(child));
 
@@ -66,20 +70,23 @@ export const moveNodes = (from, to) => {
   return to;
 };
 
+
 // Copy arributes 'from' one element 'to' another.
 export const copyAttrs = (from, to, excluded = []) =>
   Array.from(from.attributes || []).forEach(attr => !~excluded.indexOf(attr.name) && to.setAttribute(attr.name, attr.value));
 
 
-// Encode Base 64
+// Encode Base 64.
 export const base64 = (str) =>
   btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, (match, p1) =>
     String.fromCharCode('0x' + p1)
   ));
 
+
 // Create hashCode from string.
 export const hashCode = (source) =>
   source.split("").reduce((a, b) => { a = (( a << 5) - a) + b.charCodeAt(0); return a&a }, 0);
+
 
 // Debounce callback fn.
 export const debounce = (callback, wait, immediate) => {
@@ -187,6 +194,7 @@ export const clipboard = (root) => {
   }
 };
 
+
 // Fuzzy search inplementation.
 export const fuzzysearch = (chars, stack) => {
   let slen = stack.length;
@@ -216,6 +224,7 @@ export const Memo = (modifier, previous) => {
     return previous;
   }
 };
+
 
 // Collect all parentNode elments begin from given 'node' and end on 'div[content=true]'
 export const getPath = (node, path = [node]) => {

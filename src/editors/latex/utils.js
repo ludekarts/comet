@@ -5,7 +5,8 @@ import {fuzzysearch} from "../../tools/utils";
 export const createBuffer = () => {
   let buffer = '';
   return (key) => {
-    if (key.length === 1) buffer = (key === ' ') ? '' : buffer + key;
+    // Update/Clear buffer.
+    if (key.length === 1) buffer = /[a-zA-Z^\\]/.test(key) ? (buffer + key) : '';
     else if (key === 'Backspace') buffer = buffer.slice(0, -1);
     // console.log(buffer); // Debug.
     return [buffer, () => buffer = ''];
@@ -17,7 +18,7 @@ export const createFilter = (operators, output) => (text) => {
     ? operators.reduce(
       (result, operator) => (
         (text.indexOf('\\') === 0)
-        ? ~operator.indexOf(text)
+        ? operator.indexOf(text) >= 0
         : fuzzysearch(text, operator)
       )
         ? result += `<li data-ops="${operator}"><i class="dot"></i> <span>${operator}</span></li>`

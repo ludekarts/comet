@@ -17,7 +17,7 @@ export default function latexEditor(root) {
   // ---- Scrollbars ----------------
 
   scrollbar.initialize(refs.suggestions, {maxScrollbarLength: 50});
-  scrollbar.initialize(refs.messages, {maxScrollbarLength: 10});
+  scrollbar.initialize(refs.messages, {maxScrollbarLength: 30});
 
   // ---- HOFs ----------------
 
@@ -35,7 +35,8 @@ export default function latexEditor(root) {
   const saveCaretPos = () => selectionEnd = refs.input.selectionEnd;
 
   const filterCommands = ({key, keyCode}) => {
-    if (keyCode !== 40 && keyCode !== 38) {
+    // Omit arrows.
+    if (keyCode !== 40 && keyCode !== 38 && keyCode !== 39 && keyCode !== 37) {
       [command.buffer, command.clear] = buffer(key);
       filter(command.buffer);
       // Reset suggestions references.
@@ -46,14 +47,21 @@ export default function latexEditor(root) {
   const detectArrows = (event) => {
     const {keyCode, shiftKey, ctrlKey} = event;
 
+    // Arrow Down.
     if (keyCode === 40) {
       event.preventDefault();
-      navigate(1);
+      const selected = navigate(1);
+      selected && selected.scrollIntoView({behavior: "smooth"});
     }
+
+    // Arrow UP.
     else if (keyCode === 38) {
       event.preventDefault();
-      navigate(-1);
+      const selected = navigate(-1);
+      selected && selected.scrollIntoView({behavior: "smooth"});
     }
+
+    // Enter.
     else if (keyCode === 13) {
       event.preventDefault();
       if (ctrlKey) return renderMathML();
