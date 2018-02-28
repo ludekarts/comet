@@ -1,35 +1,19 @@
 {
-  "name": "comet",
+  "name": "Comet",
+  "productName": "Comet",
   "version": "0.2.4",
   "description": "Tool for editing content and MML equations in CNXML documents",
   "main": "src/main.js",
   "scripts": {
-    "make": "electron-forge make",
     "start": "electron-forge start",
     "package": "electron-forge package",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "make": "electron-forge make",
+    "publish": "electron-forge publish",
+    "lint": "eslint src --color"
   },
-  "keywords": [
-    "Math",
-    "MathML",
-    "LaTeX",
-    "Editing",
-    "XML",
-    "CNXML"
-  ],
+  "keywords": [],
   "author": "Wojciech Ludwin, ludekarts@gmail.com",
   "license": "MIT",
-  "devDependencies": {
-    "babel-plugin-transform-async-to-generator": "^6.24.1",
-    "babel-preset-env": "^1.6.0",
-    "babel-preset-react": "^6.24.1",
-    "electron-forge": "^3.1.0",
-    "electron-prebuilt-compile": "1.6.11"
-  },
-  "dependencies": {
-    "electron-compile": "^6.4.1",
-    "perfect-scrollbar": "^0.7.1"
-  },
   "config": {
     "forge": {
       "make_targets": {
@@ -45,21 +29,38 @@
         ]
       },
       "electronPackagerConfig": {
-        "icon": "./src/icons/png"
+        "packageManager": "yarn"
       },
       "electronWinstallerConfig": {
-        "name": "Comet",
-        "setupIcon": "./src/icons/win/icon.ico"
+        "name": "Comet"
       },
       "electronInstallerDebian": {},
       "electronInstallerRedhat": {},
       "github_repository": {
         "owner": "ludekarts",
-        "name": "Comet"
+        "name": "comet"
       },
       "windowsStoreConfig": {
-        "packageName": ""
+        "packageName": "Comet",
+        "name": "Comet"
       }
     }
+  },
+  "dependencies": {
+    "electron-compile": "^6.4.2",
+    "electron-squirrel-startup": "^1.0.0",
+    "perfect-scrollbar": "0.7.1"
+  },
+  "devDependencies": {
+    "babel-plugin-transform-async-to-generator": "^6.24.1",
+    "babel-preset-env": "^1.6.1",
+    "babel-preset-react": "^6.24.1",
+    "electron-forge": "^5.1.1",
+    "electron-prebuilt-compile": "1.8.2",
+    "eslint": "^3",
+    "eslint-config-airbnb": "^15",
+    "eslint-plugin-import": "^2",
+    "eslint-plugin-jsx-a11y": "^5",
+    "eslint-plugin-react": "^7"
   }
 }

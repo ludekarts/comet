@@ -5,6 +5,7 @@ import {remote} from "electron";
 // Vendors.
 import scrollbar from "perfect-scrollbar";
 
+console.log(scrollbar);
 // Core.
 import Search from "./search";
 import Navigator from "./navigator";
