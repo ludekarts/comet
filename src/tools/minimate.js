@@ -1,6 +1,6 @@
 // minimate.js v 0.1.0
 // by Wojciech Ludwin 2017, ludekarts@gmail.com, wldesign.pl
-// Your best pal in CSS classes joggling.
+// Your best pal in juggling CSS classes
 
 export default (element) => {
   let globalTime = 0, isStagger = false, globalOffset = 0;

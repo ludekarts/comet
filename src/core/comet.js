@@ -5,7 +5,6 @@ import {remote} from "electron";
 // Vendors.
 import scrollbar from "perfect-scrollbar";
 
-console.log(scrollbar);
 // Core.
 import Search from "./search";
 import Navigator from "./navigator";
@@ -19,7 +18,7 @@ import wrapp from "../tools/wrapp";
 import minimate from "../tools/minimate";
 import {createElement} from "../tools/travrs";
 import {xmlLoader, saveFile} from "../tools/io";
-import {renderMath, wrapMath, updateMath} from "../tools/math";
+import {renderMath, wrapMath, updateMath, getTexAnnotation} from "../tools/math";
 import {
   Memo, getPath, formatXml, loopstack, pause, clipboard,
   debounce, getChildOffsteAt, getSelectionRange
@@ -157,13 +156,13 @@ const activeNode = Memo((current, active) => {
 });
 
 
-const editMeta = ({target}) => {
+const editMetadata = ({target}) => {
   if (target.matches && target.matches('div[data-type=metadata]')) {
     target.classList.toggle('expand');
   }
 }
 
-const editNode = ({target, ctrlKey}) => {
+const editContentHandler = ({target, ctrlKey}) => {
   // console.log(target); // Debug.
   const isMath = target.matches('span.jax-math');
 
@@ -173,11 +172,15 @@ const editNode = ({target, ctrlKey}) => {
   // Skip ignoreNodes.
   if (ignoreNodes.find(selector => target.matches(selector))) return;
 
-  // Handel Maths.
+  // Handel Maths - Select math node in Navigator.
+  // Math editing is handled in Latex-Editor.
   if (target.dataset.type === 'math') {
     navigator.select('span.jax-math').set(target);
     displayPath(target);
     search.clear();
+
+    // Add MML annotation as a LaTeX formula.
+    latexEditor.addFormula(getTexAnnotation(target), true);
 
     // Copy MML to the clipboard.
     ctrlKey && isMath && clip(target.querySelector('span[data-mathml]').dataset.mathml);
@@ -206,7 +209,7 @@ const editNode = ({target, ctrlKey}) => {
   }
 };
 
-const detectAppAction = ({target}) => {
+const appMenuHandler = ({target}) => {
   const action = target.dataset.action;
   if (!action) return;
   else if (action === 'close') remote.getCurrentWindow().close();
@@ -223,12 +226,12 @@ search.onFound(() => navigator.select('span.found'));
 latexEditor.onMathApply((mml, latex) => {
   const node = navigator.current();
   if (node.dataset.type !== 'math') return;
-  updateMath(node, mml).then(recordState);
+  updateMath(node, mml, latex).then(recordState);
   equationsPanel.add(mml, latex);
 });
 
 // Convert selected text into math.
-wrappersPanel.onMathWrapp((selection) => latexEditor.render(selection).then(insertMath));
+wrappersPanel.onMathWrapp((selection) => latexEditor.render(selection.toString()).then(insertMath));
 
 // Hide Attributes editor on it's demand (in this case onUnwrap).
 attribsEditor.onClose(() => sidePanel.classList.remove('show'));
@@ -265,7 +268,7 @@ const toggleSpinner = () =>
 const toggleFileLoader = () =>
   xmlLoader().then(parse).catch(console.error);
 
-const detectAction = ({target}) => {
+const bottomMenuHandler = ({target}) => {
   const action = target.dataset.action;
   if (!action) return;
 
@@ -285,7 +288,7 @@ const detectAction = ({target}) => {
 
 // ---- Keyboard shortcuts ----------------
 
-const keyboard = (event) => {
+const keyboardHandler = (event) => {
   const {keyCode, key, altKey, ctrlKey, shiftKey, target} = event;
   const isEditable = !target.matches('input');
 
@@ -361,9 +364,9 @@ const outputHandlers = ({target}) => {
 
 // ---- Listeners -----------------------
 
-editor.addEventListener('click', editNode);
-editor.addEventListener('dblclick', editMeta);
-menu.addEventListener('click', detectAction);
+editor.addEventListener('click', editContentHandler);
+editor.addEventListener('dblclick', editMetadata);
+menu.addEventListener('click', bottomMenuHandler);
 output.addEventListener('click', outputHandlers);
-header.addEventListener('click', detectAppAction);
-document.addEventListener('keydown', keyboard);
+header.addEventListener('click', appMenuHandler);
+document.addEventListener('keydown', keyboardHandler);

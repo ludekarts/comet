@@ -54,7 +54,9 @@ const clone = (node, double) => {
 
 // Add namespace for math elements.
 const transformMath = (node) =>
-  node.outerHTML = node.outerHTML.replace(/(<m|<\/m)/g, (match) => match === '<m' ? '<m:m' : '</m:m');
+  node.outerHTML = node.outerHTML.replace(/<([^<>]+)>/g,
+    (match, content) => ~match.indexOf('</') ? `</m:${content.substring(1)}>` : `<m:${content}>`
+  );
 
 const transformLinks = (node) =>
   node.textContent === 'link' && (node.innerHTML = '');

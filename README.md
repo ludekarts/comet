@@ -4,7 +4,7 @@
 
 ## Changelog
 
-### To do: v 0.2.5
+### To do: v 0.2.6
 - Added Immutable.js
 - Better handling of undo.
 - Extending LaTeX input box.
@@ -15,6 +15,10 @@
 - FIx for scrolling in errro messages.
 - Arrow navigation thorugh Euations panel.
 - Proprer focus with Equations panel.
+
+### v 0.2.5
+- ⭐️ Added support for LaTeX annotations in MML.
+- 🐛 Fixed bug with wrap math widget.
 
 ### v 0.2.4
 - ⭐️ Added support for tex2mml-SiUnitX.

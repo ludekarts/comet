@@ -12,7 +12,7 @@ export const wrapMath = (content) => {
     // Detect Block equations.
     if (equation.parentNode.classList.contains('MJXc-display')) equation = equation.parentNode;
     // MathJax generate 3 nodes per equation -> wrap them all in one OR skip if already exists.
-    if (!equation.parentNode.matches('span.jax-math')) {      
+    if (!equation.parentNode.matches('span.jax-math')) {
       const wrapper = wrapp.elements([equation.previousSibling, equation, equation.nextSibling], 'span');
       wrapper.className = 'jax-math';
       wrapper.dataset.type = 'math';
@@ -24,6 +24,19 @@ export const wrapMath = (content) => {
 };
 
 
+const addTexAnnotation = (element, latex) => {
+  const needMrowWrapper = element.firstElementChild.children.length > 1;
+  if (needMrowWrapper) wrapp.elements(Array.from(element.firstElementChild.children), "mrow");
+
+  const semantics = wrapp.elements(Array.from(element.firstElementChild.children), "semantics");
+  const annotation = document.createElement("annotation");
+  annotation.setAttribute("encoding","application/x-tex");
+  annotation.textContent = latex;
+  semantics.appendChild(annotation);
+
+  return element;
+}
+
 /**
  * Update MathJax inside given HTMLElement with new MML.
  * @param  {String}       mml new MathML content.
@@ -31,8 +44,9 @@ export const wrapMath = (content) => {
  * @return {Promise}
  */
 
-export const updateMath = (element, mml) => new Promise((resolve) => {
+export const updateMath = (element, mml, latex) => new Promise((resolve) => {
   element.innerHTML = mml;
+  addTexAnnotation(element, latex);
   MathJax.Hub.Queue(["Typeset", MathJax.Hub, element, () => {
     element.dataset.mathId = element.querySelector('script').id;
     resolve(mml);
@@ -66,3 +80,14 @@ export const latexToMML = () => {
     MathJax.Hub.Queue(["Typeset", MathJax.Hub, buffer, resolve.bind(this, buffer)]);
   });
 };
+
+/**
+ * Get TeX annotation from MathJax Node.
+ * @param  {MathJaxNode} math Node containing math.
+ * @return {String}           TeX Formula.
+ */
+export const getTexAnnotation = math => {
+  if (!math) return ""
+  const annotation = math.querySelector("annotation")
+  return annotation ? annotation.textContent.trim() : ""
+}

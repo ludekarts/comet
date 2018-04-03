@@ -155,7 +155,8 @@ export default function latexEditor(root) {
     ? connect(latex, refs.useblock.checked).then((json) => json.result)
     : singleRender(latex).then(parseMathJax).then((json) => json.result);
 
-  const addFormula = (latex) => {
+  const addFormula = (latex, clear) => {
+    if (clear) refs.input.value = "";
     refs.input.focus();
     refs.input.setSelectionRange(selectionEnd, selectionEnd);
     document.execCommand('insertText', null, latex);
