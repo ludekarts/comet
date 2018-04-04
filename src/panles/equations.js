@@ -35,7 +35,7 @@ export default (editor) => {
       else {
         const selection = document.getSelection();
         if (selection.anchorNode && editor.contains(selection.anchorNode))
-          onPlaceMMLCallback && onPlaceMMLCallback(equation.mml);
+          onPlaceMMLCallback && onPlaceMMLCallback(equation);
         else
           onPlaceLatexCallback && onPlaceLatexCallback(equation.latex);
       }

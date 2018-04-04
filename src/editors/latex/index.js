@@ -152,8 +152,8 @@ export default function latexEditor(root) {
   };
 
   const render = (latex) => !refs.usejax.checked
-    ? connect(latex, refs.useblock.checked).then((json) => json.result)
-    : singleRender(latex).then(parseMathJax).then((json) => json.result);
+    ? connect(latex, refs.useblock.checked).then((json) => ({mml: json.result, latex}))
+    : singleRender(latex).then(parseMathJax).then((json) => ({mml: json.result, latex}));
 
   const addFormula = (latex, clear) => {
     if (clear) refs.input.value = "";

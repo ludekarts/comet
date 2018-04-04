@@ -1,5 +1,4 @@
 // Electron.
-// Electron.
 import {remote} from "electron";
 
 // Vendors.
@@ -132,13 +131,13 @@ const updateSimilar = (node, mml, latex) => {
 
 // ---- Glue Logic ----------------
 
-const insertMath = (mml) => {
+const insertMath = ({mml, latex}) => {
   const math = wrapp.selection(createElement('span'), {
     'class': 'jax-math',
     'data-type': 'math',
     'contenteditable': 'false'
   });
-  updateMath(math, mml).then(recordState);
+  updateMath(math, mml, latex).then(recordState);
 };
 
 const parse = (xml) => {
@@ -298,7 +297,7 @@ const toggleSpinner = () =>
   new Promise((resolve) => (spinnerPanel.toggle(), setTimeout(resolve, 300)));
 
 const toggleFileLoader = () =>
-  xmlLoader("C:\\Users\\Ludek\\Desktop\\test.cnxml").then(parse).catch(console.error);
+  xmlLoader().then(parse).catch(console.error);
 
 const bottomMenuHandler = ({target}) => {
   const action = target.dataset.action;
