@@ -18,6 +18,11 @@ const scaffold = `
         label.switch
           @useblock::input[type="checkbox"]
           span.slider
+      span.tex-switch
+        span > "Update similar"
+        label.switch
+          @similar::input[type="checkbox"]
+          span.slider
       button.render[title="Ctrl + Enter" data-action="render"] > "Render"
       button.apply[title="Shift + Enter"data-action="apply"] > "Apply"
     @messages::ul.messages

@@ -18,7 +18,12 @@ import wrapp from "../tools/wrapp";
 import minimate from "../tools/minimate";
 import {createElement} from "../tools/travrs";
 import {xmlLoader, saveFile} from "../tools/io";
-import {renderMath, wrapMath, updateMath, getTexAnnotation} from "../tools/math";
+
+import {
+  renderMath, wrapMath, updateMath,
+  getTexAnnotation, addTexAnnotation
+} from "../tools/math";
+
 import {
   Memo, getPath, formatXml, loopstack, pause, clipboard,
   debounce, getChildOffsteAt, getSelectionRange
@@ -99,6 +104,30 @@ const restoreState = () => {
   const snapshot = history.pull();
   if (snapshot) editor.innerHTML = snapshot;
 };
+
+// Bulk update of all math with same MML + annotations.
+const updateSimilar = (node, mml, latex) => {
+  const current = navigator.current();
+  if (!current.matches("span.jax-math")) return;
+
+  const currentMml = current.querySelector("script").textContent.replace(/\n/g, "");
+
+  recordState();
+
+  return Promise.all(Array
+    .from(editor.querySelectorAll("span.jax-math"))
+    .reduce((acc, math) => {
+      const tempMml = math.querySelector("script").textContent.replace(/\n/g, "");
+      if (currentMml === tempMml) acc.push(math)
+      return acc
+    }, [])
+    .map(similar => updateMath(similar, mml, latex))
+  )
+  .catch(error => {
+    restoreState();
+    console.error(error);
+  })
+}
 
 
 // ---- Glue Logic ----------------
@@ -223,10 +252,13 @@ const appMenuHandler = ({target}) => {
 search.onFound(() => navigator.select('span.found'));
 
 // Replace selected MathJax equation.
-latexEditor.onMathApply((mml, latex) => {
+latexEditor.onMathApply((mml, latex, similar) => {
   const node = navigator.current();
   if (node.dataset.type !== 'math') return;
-  updateMath(node, mml, latex).then(recordState);
+  similar
+    ? updateSimilar(node, mml, latex).then(recordState)
+    : updateMath(node, mml, latex).then(recordState);
+
   equationsPanel.add(mml, latex);
 });
 
@@ -266,7 +298,7 @@ const toggleSpinner = () =>
   new Promise((resolve) => (spinnerPanel.toggle(), setTimeout(resolve, 300)));
 
 const toggleFileLoader = () =>
-  xmlLoader().then(parse).catch(console.error);
+  xmlLoader("C:\\Users\\Ludek\\Desktop\\test.cnxml").then(parse).catch(console.error);
 
 const bottomMenuHandler = ({target}) => {
   const action = target.dataset.action;
@@ -308,12 +340,20 @@ const keyboardHandler = (event) => {
 
   // Tab.
   if (keyCode === 9) {
-    // Make selection.
     event.preventDefault();
-    navigator.next().scrollIntoView();
+
+    // Make selection.
+    const current = navigator.next()
+    current.scrollIntoView();
     editor.scrollTop = editor.scrollTop - 80;
 
-    // Use editor
+    // Update Math annotation.
+    if (current.dataset.type === "math") {
+      const annotation = getTexAnnotation(current);
+      !!annotation.length && latexEditor.addFormula(annotation, true);
+    }
+
+    // Use editor.
     if (currentEditor) {
       const node = navigator.current();
       const name = getName(node);

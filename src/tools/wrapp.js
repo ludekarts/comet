@@ -36,6 +36,7 @@ export default (function wrapp() {
 
 
   /**
+   * // TODO: Split this in two functions.
    * Wraps selection with element or place element if selection length is 0.
    * @param  {HTMLElement|String} element HTMLElement that will be inserted of wrapped aroud the selection.
    *                                      If element is string then create elemenet if type provided in string.

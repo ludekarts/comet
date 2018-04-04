@@ -100,7 +100,7 @@ export default function latexEditor(root) {
   const applyMathML = () => {
     if (!refs.render.textContent.length) return;
     const math = MathJax.Hub.getAllJax(refs.render)[0];
-    onMathApplyCallback && onMathApplyCallback(math.root.toMathML(), refs.input.value);
+    onMathApplyCallback && onMathApplyCallback(math.root.toMathML(), refs.input.value, refs.similar.checked);
   };
 
   const detectTexAction = ({target}) => {

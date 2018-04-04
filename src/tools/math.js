@@ -10,19 +10,36 @@ export const wrapMath = (content) => {
   MathJax.Hub.getAllJax(content).forEach(math => {
     let equation = content.querySelector(`#${math.inputID}-Frame`);
     // Detect Block equations.
-    if (equation.parentNode.classList.contains('MJXc-display')) equation = equation.parentNode;
+    if (equation.parentNode.classList.contains("MJXc-display")) equation = equation.parentNode;
     // MathJax generate 3 nodes per equation -> wrap them all in one OR skip if already exists.
-    if (!equation.parentNode.matches('span.jax-math')) {
-      const wrapper = wrapp.elements([equation.previousSibling, equation, equation.nextSibling], 'span');
-      wrapper.className = 'jax-math';
-      wrapper.dataset.type = 'math';
+    if (!equation.parentNode.matches("span.jax-math")) {
+      const wrapper = wrapp.elements([equation.previousSibling, equation, equation.nextSibling], "span");
+      wrapper.className = "jax-math";
+      wrapper.dataset.type = "math";
       wrapper.dataset.mathId = math.inputID;
-      wrapper.setAttribute('contenteditable', false);
+      wrapper.setAttribute("contenteditable", false);
     }
   });
   return content;
 };
 
+/**
+ * Get TeX annotation from MathJax Node.
+ * @param  {MathJaxNode} math Node containing math.
+ * @return {String}           LaTeX Formula.
+ */
+export const getTexAnnotation = math => {
+  if (!math) return ""
+  const annotation = math.querySelector("annotation")
+  return annotation ? annotation.textContent.trim() : ""
+}
+
+/**
+ * Add TeX annotations to the element containing math.
+ * @param {HTMLElement}  element Element containing <math> node.
+ * @param {String}       latex   LaTeX formula to annotate with.
+ * @return {HTMLElement}         Reference to the received element with added annotation.
+ */
 
 const addTexAnnotation = (element, latex) => {
   const needMrowWrapper = element.firstElementChild.children.length > 1;
@@ -39,16 +56,17 @@ const addTexAnnotation = (element, latex) => {
 
 /**
  * Update MathJax inside given HTMLElement with new MML.
- * @param  {String}       mml new MathML content.
  * @param  {HTMLElement}  element Reference to the element that need to be updated.
- * @return {Promise}
+ * @param  {String}       mml     New MathML content.
+ * @param  {String}       latex   LaTeX formula to annotate with.
+ * @return {Promise}              Promise that is resolved with new MML content as string.
  */
 
-export const updateMath = (element, mml, latex) => new Promise((resolve) => {
+export const updateMath = (element, mml, latex) => new Promise(resolve => {
   element.innerHTML = mml;
-  addTexAnnotation(element, latex);
+  latex && !mml.includes("<semantics>") && addTexAnnotation(element, latex);
   MathJax.Hub.Queue(["Typeset", MathJax.Hub, element, () => {
-    element.dataset.mathId = element.querySelector('script').id;
+    element.dataset.mathId = element.querySelector("script").id;
     resolve(mml);
   }]);
 });
@@ -59,35 +77,25 @@ export const updateMath = (element, mml, latex) => new Promise((resolve) => {
  * @param  {HTMLElement} container DOM node thet contains math to render.
  * @return {Promise}               Promise resolves when math is ready.
  */
-export const renderMath = (container) => new Promise((resolve) =>
-  MathJax.Hub.Queue(["Typeset", MathJax.Hub, container, () => resolve(container)]));
+export const renderMath = container => new Promise((resolve) =>
+  MathJax.Hub.Queue(["Typeset", MathJax.Hub, container, () => resolve(container)])
+);
 
 
 /**
- * Create hidden node in document.body to render math in it and returns
- * rendered math with the node.
- * @return {Function} New functin that returns Promise which is reday when
- *                    the LaTeX formula is ready.
+ * Create hidden node in "document.body" to render math in it and return rendered math within the node.
+ * @return {Function} New function that returns Promise which tahes LaTeX formula and is resolved when
+ *                    the MathJax is ready and math is rendered.
  */
 export const latexToMML = () => {
-  const buffer = document.createElement('span');
+  const buffer = document.createElement("span");
   buffer.style.position = "absolute";
   buffer.style.left = "-9999px";
-  buffer.innerHTML = '$x$';
+  buffer.innerHTML = "$x$";
   document.body.appendChild(buffer);
+
   return (latex) => new Promise((resolve) => {
     buffer.innerHTML = `$${latex}$`;
     MathJax.Hub.Queue(["Typeset", MathJax.Hub, buffer, resolve.bind(this, buffer)]);
   });
 };
-
-/**
- * Get TeX annotation from MathJax Node.
- * @param  {MathJaxNode} math Node containing math.
- * @return {String}           TeX Formula.
- */
-export const getTexAnnotation = math => {
-  if (!math) return ""
-  const annotation = math.querySelector("annotation")
-  return annotation ? annotation.textContent.trim() : ""
-}

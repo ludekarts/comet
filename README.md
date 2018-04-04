@@ -17,6 +17,7 @@
 - Proprer focus with Equations panel.
 
 ### v 0.2.5
+- ⭐️ Added support for updating simmilar MMLs with single edit.
 - ⭐️ Added support for LaTeX annotations in MML.
 - 🐛 Fixed bug with wrap math widget.
 
