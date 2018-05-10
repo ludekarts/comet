@@ -121,5 +121,7 @@ export const toXML = (htmlNode) => {
     // Remove all spaces between tags.
     .replace(/>\s*?</g, '><')
     // Remove all multiple spaces.
-    .replace(/\s{2,}/g, ' ');
+    .replace(/\s{2,}/g, ' ')
+    // Replace old version ov CNXML.
+    .replace("cnxml-version=\"0.7\"", "cnxml-version=\"0.8\"")
 };

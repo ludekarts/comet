@@ -4,7 +4,7 @@
 
 ## Changelog
 
-### To do: v 0.2.6
+### To do: v 0.2.7
 - Added Immutable.js
 - Better handling of undo.
 - Extending LaTeX input box.
@@ -15,6 +15,9 @@
 - FIx for scrolling in errro messages.
 - Arrow navigation thorugh Euations panel.
 - Proprer focus with Equations panel.
+
+### v 0.2.6
+- ⭐️ Added automatinc CNXML version bump form esited modules.
 
 ### v 0.2.5
 - ⭐️ Added support for updating simmilar MMLs with single edit.
